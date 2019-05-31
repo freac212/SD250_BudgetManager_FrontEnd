@@ -1,19 +1,29 @@
 ﻿@{
     ViewBag.Title = "Index";
     ViewBag.Description = "Home Page";
+
+    string messageColour;
+
+    if (TempData["MessageColour"] != null) {
+        messageColour = TempData["MessageColour"].ToString();
+    }
+    else
+    {
+        messageColour = "success";
+    }
 }
 
-@if (!String.IsNullOrWhiteSpace(ViewBag.Success))
+@if (TempData["LoginMessage"] != null)
 {
-    <div class="box box-solid box-success">
+    <div class="box box-solid box-@messageColour">
         <div class="box-header with-border">
-            <h3 class="box-title">Removable</h3>
+            <h3 class="box-title">Message</h3>
             <div class="box-tools pull-right">
                 <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
             </div><!-- /.box-tools -->
         </div><!-- /.box-header -->
         <div class="box-body">
-            @ViewBag.Success
+            @TempData["LoginMessage"]
         </div><!-- /.box-body -->
     </div><!-- /.box -->
 }

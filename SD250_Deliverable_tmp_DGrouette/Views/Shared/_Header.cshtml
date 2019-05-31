@@ -1,4 +1,17 @@
-﻿<header class="main-header">
+﻿@*@model LoginViewModel*@
+
+@{
+    string userName;
+    if (Request.Cookies["UserCookie"] != null)
+    {
+        userName = Request.Cookies["UserCookie"].Value;
+    }
+    else
+    {
+        userName = "User";
+    }
+}
+<header class="main-header">
     @* BEGIN Logo *@
     <a href="@Url.Action("Index", "Home")" class="logo">
         @* Mini logo for sidebar 50x50 pixels *@
@@ -15,50 +28,110 @@
         <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
                 @* BEGIN User Account Menu *@
-                <li>
-                    
-                    <a href="@Url.Action("RegisterUser", "Account")" class="text-info">
-                        <span class="hidden-xs">Register</span>
-                    </a>
-                </li>
-                @*<li class="dropdown user user-menu">
+                @if (Request.Cookies["UserAuthCookie"] != null)
+                {
+                    // Logged in User
+                    // Create a partial view using a userViewModel
+                    // it gets the user from the api with the token?
+                    // and passes it through the ViewModel?
+                    <li class="dropdown user user-menu">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <img src="~/Content/img/user.jpg" class="user-image" alt="User Image">
-                            <span class="hidden-xs">Alexander Pierce</span>
+                            <img src="~/Content/img/user.png" class="user-image" alt="User Image">
+                            <span class="hidden-xs">
+                                @userName
+                            </span>
                         </a>
                         <ul class="dropdown-menu">
                             <li class="user-header">
-                                <img src="~/Content/img/user.jpg" class="img-circle" alt="User Image">
+                                <img src="~/Content/img/user.png" class="img-circle" alt="User Image">
 
                                 <p>
-                                    Alexander Pierce - Web Developer
-                                    <small>Member since Nov. 2012</small>
+                                    @userName
+                                    <small>Member</small>
                                 </p>
                             </li>
                             <li class="user-body">
                                 <div class="row">
-                                    <div class="col-xs-4 text-center">
-                                        <a href="#">Followers</a>
+                                    <div class="col-xs-6 text-center">
+                                        <a href="#">Change Password</a>
                                     </div>
-                                    <div class="col-xs-4 text-center">
-                                        <a href="#">Sales</a>
-                                    </div>
-                                    <div class="col-xs-4 text-center">
-                                        <a href="#">Friends</a>
+                                    <div class="col-xs-6 text-center">
+                                        <a href="#">Woop</a>
                                     </div>
                                 </div>
                             </li>
                             <li class="user-footer">
                                 <div class="pull-left">
-                                    <a href="#" class="btn btn-default btn-flat">Profile</a>
+                                    <a href="@Url.Action("ChangePassword", "Account")" class="text-info">
+                                        Change Password
+                                    </a>
                                 </div>
                                 <div class="pull-right">
-                                    <a href="#" class="btn btn-default btn-flat">Sign out</a>
+                                    <a href="@Url.Action("LogOut", "Account")" class="text-info">
+                                        Sign Out
+                                    </a>
                                 </div>
                             </li>
                         </ul>
                     </li>
-                *@
+
+                }
+                else
+                {
+                    <li class="dropdown user user-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="hidden-xs">Log In</span>
+                        </a>
+                        <ul class="dropdown-menu" style="padding: 20px;">
+                            @using (Html.BeginForm("LogIn", "Account"))
+                            {
+                                @Html.AntiForgeryToken();
+
+                                <div class="form-horizontal">
+                                    <h4>Please input your login information</h4>
+                                    <hr />
+                                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                    <div class="form-group">
+                                        @*@Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })*@
+                                        @Html.Label("Email", new { @class = "control-label col-md-2" })
+                                        <div class="col-xs-10">
+                                            @Html.TextBox("Email", null, new { @class = "form-control" })
+                                            @*@Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })*@
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @*@Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "control-label col-md-2" })*@
+                                        @Html.Label("Password", new { @class = "control-label col-md-2" })
+                                        <div class="col-xs-10">
+                                            @Html.TextBox("Password", null, new { @class = "form-control password", type = "password" })
+                                            @*@Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control password", type = "password" } })*@
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-xs-offset-2 col-xs-10">
+                                            <input type="submit" value="Submit" class="btn btn-default" />
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+
+                            <li class="list-group-item">
+                                <a href="@Url.Action("RecoverPassword", "Account")" class="text-info">
+                                    <span class="hidden-xs">Recover Lost Password</span>
+                                </a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="@Url.Action("RegisterUser", "Account")" class="text-info">
+                                    <span class="hidden-xs">Register</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+
                 @* END User Account Menu *@
                 @* BEGIN Control Sidebar Toggle Button *@
                 <li>
