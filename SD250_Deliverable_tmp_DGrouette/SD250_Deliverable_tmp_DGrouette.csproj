@@ -134,6 +134,7 @@
     <Content Include="Views\Account\ResetPassword.cshtml" />
     <Content Include="Views\Account\LogIn.cshtml" />
     <Content Include="Views\Account\ChangePassword.cshtml" />
+    <Content Include="Views\Household\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -143,8 +144,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\HouseholdController.cs" />
     <Compile Include="Models\Domain\ErrorData.cs" />
     <Compile Include="Models\Domain\LoginData.cs" />
+    <Compile Include="Models\Filters\AuthAttribute.cs" />
+    <Compile Include="Models\Views\CategoryViewModel.cs" />
+    <Compile Include="Models\Views\CreateHouseholdViewModel.cs" />
+    <Compile Include="Models\Views\HouseholdUserViewModel.cs" />
+    <Compile Include="Models\Views\HouseholdViewModel.cs" />
     <Compile Include="Models\Views\LoginViewModel.cs" />
     <Compile Include="Models\Views\RecoverPasswordViewModel.cs" />
     <Compile Include="Models\Views\RegisterUserViewModel.cs" />

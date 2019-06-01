@@ -34,6 +34,36 @@
             </section>
 
             <section class="content">
+                @{
+                    ViewBag.Title = "Index";
+                    ViewBag.Description = "Home Page";
+
+                    string messageColour;
+
+                    if (TempData["MessageColour"] != null)
+                    {
+                        messageColour = TempData["MessageColour"].ToString();
+                    }
+                    else
+                    {
+                        messageColour = "success";
+                    }
+                }
+
+                @if (TempData["LoginMessage"] != null)
+                {
+                    <div class="box box-solid box-@messageColour">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Message</h3>
+                            <div class="box-tools pull-right">
+                                <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div><!-- /.box-tools -->
+                        </div><!-- /.box-header -->
+                        <div class="box-body">
+                            @TempData["LoginMessage"]
+                        </div><!-- /.box-body -->
+                    </div><!-- /.box -->
+                }
                 @RenderBody()
             </section>
         </div>

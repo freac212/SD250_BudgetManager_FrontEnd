@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SD220_Deliverable_1_DGrouette.Models.Filters;
 using SD250_Deliverable_tmp_DGrouette.Models.Domain;
 using SD250_Deliverable_tmp_DGrouette.Models.Views;
 using System;
@@ -115,6 +116,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
         // GET: Login
         [HttpGet]
+        [Auth]
         public ActionResult LogOut()
         {
             // Bassically removing the cookie, in the goofiest way possible.
@@ -287,17 +289,17 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         }
 
 
-        //GET ResetPassword
+        //GET ChangePassword
         [HttpGet]
-        // Ensure user is logged in filter.. (Just check to see if the cookie exists)
+        [Auth]
         public ActionResult ChangePassword()
         {
             return View();
         }
 
-        //POST ResetPassword
+        //POST ChangePassword
         [HttpPost]
-        // Ensure user is logged in filter..
+        [Auth]
         public ActionResult ChangePassword(ChangePasswordViewModel changePasswordViewModel)
         {
             if (!ModelState.IsValid)
