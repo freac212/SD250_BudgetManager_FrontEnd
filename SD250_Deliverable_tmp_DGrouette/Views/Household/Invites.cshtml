@@ -1,0 +1,38 @@
+﻿@model List<InviteViewModel>
+
+@{
+    ViewBag.Title = "Invites";
+}
+
+@section Scripts {
+    <script type="text/javascript" src="~/Content/js/plugins/jquery/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#invitesTable').DataTable();
+        });
+    </script>
+}
+
+@section css {
+    <link href="~/Content/css/jquery.dataTables.min.css" rel="stylesheet" />
+}
+
+<table id="invitesTable" class="table-striped">
+    <thead>
+        <tr>
+            <th>Invites</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>Invited to @item.Name by @item.Creator</td>
+                <td>
+                    @Html.ActionLink("Join", "Join", new { Id = item.Id })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

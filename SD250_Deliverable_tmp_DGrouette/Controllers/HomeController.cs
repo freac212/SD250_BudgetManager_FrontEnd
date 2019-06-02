@@ -7,13 +7,14 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            return View();
+            // Just incase ¯\_(ツ)_/¯
+            return RedirectToAction("Index", "Household");
         }
 
         [HttpGet]
         public ActionResult AnotherLink()
         {
-            return View("Index");
+            return RedirectToAction("Index", "Household");
         }
     }
 }

@@ -15,9 +15,9 @@
     @* BEGIN Logo *@
     <a href="@Url.Action("Index", "Home")" class="logo">
         @* Mini logo for sidebar 50x50 pixels *@
-        <span class="logo-mini"><b>A</b>LT</span>
+        <span class="logo-mini"><b>B</b>M</span>
         @* Logo for regular state and mobile devices *@
-        <span class="logo-lg"><b>Admin</b>LTE</span>
+        <span class="logo-lg"><b>Budget</b>Manager</span>
     </a>
     @* END Logo *@
     @* BEGIN Header *@
@@ -50,16 +50,16 @@
                                     <small>Member</small>
                                 </p>
                             </li>
-                            <li class="user-body">
-                                <div class="row">
-                                    <div class="col-xs-6 text-center">
-                                        <a href="#">Change Password</a>
+                            @*<li class="user-body">
+                                    <div class="row">
+                                        <div class="col-xs-6 text-center">
+                                            <a href="#">Change Password</a>
+                                        </div>
+                                        <div class="col-xs-6 text-center">
+                                            <a href="#">Woop</a>
+                                        </div>
                                     </div>
-                                    <div class="col-xs-6 text-center">
-                                        <a href="#">Woop</a>
-                                    </div>
-                                </div>
-                            </li>
+                                </li>*@
                             <li class="user-footer">
                                 <div class="pull-left">
                                     <a href="@Url.Action("ChangePassword", "Account")" class="text-info">
@@ -87,22 +87,22 @@
                             {
                                 @Html.AntiForgeryToken();
 
-                                <div class="form-horizontal">
+                                <li class="form-horizontal">
                                     <h4>Please input your login information</h4>
                                     <hr />
                                     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                                     <div class="form-group">
                                         @*@Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })*@
-                                        @Html.Label("Email", new { @class = "control-label col-md-2" })
+                                        @Html.Label("Email", new { @class = "control-label col-md-2", style = "width: unset;" })
                                         <div class="col-xs-10">
                                             @Html.TextBox("Email", null, new { @class = "form-control" })
                                             @*@Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })*@
                                         </div>
                                     </div>
 
-                                    <div class="form-group">
+                                    <div class="form-group" style="">
                                         @*@Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "control-label col-md-2" })*@
-                                        @Html.Label("Password", new { @class = "control-label col-md-2" })
+                                        @Html.Label("Password", new { @class = "control-label col-md-2", style = "width: unset;" })
                                         <div class="col-xs-10">
                                             @Html.TextBox("Password", null, new { @class = "form-control password", type = "password" })
                                             @*@Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control password", type = "password" } })*@
@@ -110,11 +110,11 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <div class="col-xs-offset-2 col-xs-10">
+                                        <div class="col-xs-10">
                                             <input type="submit" value="Submit" class="btn btn-default" />
                                         </div>
                                     </div>
-                                </div>
+                                </li>
                             }
 
 
@@ -134,9 +134,9 @@
 
                 @* END User Account Menu *@
                 @* BEGIN Control Sidebar Toggle Button *@
-                <li>
-                    <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
-                </li>
+                @*<li>
+                        <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+                    </li>*@
                 @* END Control Sidebar Toggle Button *@
             </ul>
         </div>

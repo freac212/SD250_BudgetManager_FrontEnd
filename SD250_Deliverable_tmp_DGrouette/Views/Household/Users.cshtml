@@ -1,0 +1,55 @@
+﻿@model HouseholdUserViewModel
+
+@{
+    ViewBag.Title = "Household Users";
+}
+
+@section Scripts {
+    <script type="text/javascript" src="~/Content/js/plugins/jquery/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#userTable').DataTable();
+        });
+    </script>
+}
+
+@section css {
+    <link href="~/Content/css/jquery.dataTables.min.css" rel="stylesheet" />
+}
+
+<div class="info-box">
+    <!-- Apply any bg-* class to to the icon to color it -->
+    <span class="info-box-icon bg-blue"><i class="fa fa-user"></i></span>
+    <div class="info-box-content">
+        <span class="info-box-text">Users</span>
+        <span class="info-box-number">@Model.UserViewModels.Count</span>
+        @if (Model.IsCreator)
+        {
+            @Html.ActionLink($"Invite more users!", "Invite", new { HouseholdId = Model.HouseholdId })
+        }
+    </div><!-- /.info-box-content -->
+</div><!-- /.info-box -->
+
+<table id="userTable">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>UserName</th>
+            @*<th></th>*@
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.UserViewModels)
+        {
+            <tr>
+                <td>@item.Email</td>
+                <td>@item.UserName</td>
+                @*<td>@Html.ActionLink($"Remove", "RemoveUser", new { Id = item.Id })</td> Only the household creator should be able to see this*@
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    @Html.ActionLink("Back to Households", "Index")
+</div>

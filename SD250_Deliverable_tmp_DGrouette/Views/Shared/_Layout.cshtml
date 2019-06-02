@@ -10,11 +10,13 @@
         {
             @ViewBag.Title@: -
         }
-        AdminLTE
+        BudgetManager
     </title>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     @Styles.Render("~/Bundles/css")
+    @RenderSection("css", false)
+
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -68,13 +70,13 @@
             </section>
         </div>
 
-        @Html.Partial("_ControlSidebar")
+        @*@Html.Partial("_ControlSidebar")*@
     </div>
 
     <script src="@RouteJs.RouteJsHandler.HandlerUrl"></script>
     <script src="@EnumHandler.HandlerUrl"></script>
-    @RenderSection("Scripts", required: false)
     @Scripts.Render("~/Bundles/js")
+    @RenderSection("Scripts", required: false)
     @RenderSection("ViewSpecificJavascript", required: false)
 </body>
 </html>

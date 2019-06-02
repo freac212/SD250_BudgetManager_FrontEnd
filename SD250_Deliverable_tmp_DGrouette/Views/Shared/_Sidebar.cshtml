@@ -2,7 +2,7 @@
 <aside class="main-sidebar">
     <section class="sidebar">
         @* BEGIN Search *@
-        <form action="#" method="get" class="sidebar-form">
+        @*<form action="#" method="get" class="sidebar-form">
             <div class="input-group">
                 <input type="text" name="q" class="form-control" placeholder="Search...">
                 <span class="input-group-btn">
@@ -11,28 +11,35 @@
                     </button>
                 </span>
             </div>
-        </form>
+        </form>*@
         @* END Search *@
         @* BEGIN Menu *@
         <ul class="sidebar-menu" data-widget="tree">
-            <li class="header">HEADER</li>
-            <li class="@Url.IsLinkActive("Index", "Home")">
+            <li class="header">Budget Manager</li>
+            @*<li class="@Url.IsLinkActive("Index", "Home")">
                 <a href="@Url.Action("Index", "Home")"><i class="fa fa-link"></i> <span>Home</span></a>
-            </li>
-            <li class="@Url.IsLinkActive("AnotherLink", "Home")">
-                <a href="@Url.Action("AnotherLink", "Home")"><i class="fa fa-link"></i> <span>Another Link</span></a>
-            </li>
+            </li>*@
+            @*<li class="@Url.IsLinkActive("Index", "Household")">
+                <a href="@Url.Action("Index", "Household")"><i class="fa fa-link"></i> <span>Households</span></a>
+            </li>*@
             <li class="treeview">
                 <a href="#">
-                    <i class="fa fa-link"></i> <span>Multilevel</span>
+                    <i class="fa fa-link"></i> <span>Households</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a href="#">Link in level 2</a></li>
-                    <li><a href="#">Link in level 2</a></li>
+                    <li>
+                        <a href="@Url.Action("Index", "Household")"><i class="fa fa-link"></i> <span>Households</span></a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Create", "Household")"><i class="fa fa-link"></i> <span>Create Household</span></a>
+                    </li>
                 </ul>
+            </li>
+            <li class="@Url.IsLinkActive("Invites", "Household")">
+                <a href="@Url.Action("Invites", "Household")"><i class="fa fa-link"></i> <span>Invites</span></a>
             </li>
         </ul>
         @* END Menu *@

@@ -123,9 +123,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\css\jquery.dataTables.min.css" />
     <Content Include="Content\img\user.png" />
+    <Content Include="Content\js\plugins\jquery\jquery.dataTables.min.js" />
     <Content Include="Content\js\plugins\jquery\jquery.validate.min.js" />
     <Content Include="Global.asax" />
+    <None Include="Scripts\jquery-1.8.0.intellisense.js" />
+    <Content Include="Scripts\jquery-1.8.0.js" />
+    <Content Include="Scripts\jquery-1.8.0.min.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Web.config" />
     <Content Include="Views\Home\_Index - Copy - for ref.cshtml" />
     <Content Include="Views\Shared\_Header - Copy.cshtml" />
@@ -135,6 +142,11 @@
     <Content Include="Views\Account\LogIn.cshtml" />
     <Content Include="Views\Account\ChangePassword.cshtml" />
     <Content Include="Views\Household\Index.cshtml" />
+    <Content Include="Views\Household\Create.cshtml" />
+    <Content Include="Views\Household\Edit.cshtml" />
+    <Content Include="Views\Household\Users.cshtml" />
+    <Content Include="Views\Household\Invite.cshtml" />
+    <Content Include="Views\Household\Invites.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -148,15 +160,21 @@
     <Compile Include="Models\Domain\ErrorData.cs" />
     <Compile Include="Models\Domain\LoginData.cs" />
     <Compile Include="Models\Filters\AuthAttribute.cs" />
+    <Compile Include="Models\Helpers\ErrorHelpers.cs" />
     <Compile Include="Models\Views\CategoryViewModel.cs" />
+    <Compile Include="Models\Views\EditHouseholdViewModel.cs" />
     <Compile Include="Models\Views\CreateHouseholdViewModel.cs" />
     <Compile Include="Models\Views\HouseholdUserViewModel.cs" />
+    <Compile Include="Models\Views\InviteViewModel.cs" />
     <Compile Include="Models\Views\HouseholdViewModel.cs" />
+    <Compile Include="Models\Views\InviteUserViewModel.cs" />
+    <Compile Include="Models\Views\IsCreatorViewModel.cs" />
     <Compile Include="Models\Views\LoginViewModel.cs" />
     <Compile Include="Models\Views\RecoverPasswordViewModel.cs" />
     <Compile Include="Models\Views\RegisterUserViewModel.cs" />
     <Compile Include="Models\Views\ChangePasswordViewModel.cs" />
     <Compile Include="Models\Views\ResetPasswordViewModel.cs" />
+    <Compile Include="Models\Views\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

@@ -21,7 +21,7 @@
                         <div class="form-group">
                             @Html.LabelFor(model => model.Email, new { @class = "control-label col-md-2" })
                             <div class="col-md-10">
-                                @Html.TextBoxFor(model => model.Email, new { @class = "form-control" } )
+                                @Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
                                 @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
                             </div>
                         </div>
@@ -35,8 +35,18 @@
                         </div>
 
                         <div class="form-group">
-                            <div class="col-md-offset-2 col-md-10">
+                            <div class="col-md-offset-2 col-md-4">
                                 <input type="submit" value="Login" class="btn btn-default" />
+                            </div>
+                            <div class="col-md-offset-2 col-md-4">
+                                <a href="@Url.Action("RecoverPassword", "Account")" class="text-info">
+                                    <span class="hidden-xs">Recover Lost Password</span>
+                                </a>
+                            </div>
+                            <div class="col-md-offset-2 col-md-4">
+                                <a href="@Url.Action("RegisterUser", "Account")" class="text-info">
+                                    <span class="hidden-xs">Register</span>
+                                </a>
                             </div>
                         </div>
                     </div>
