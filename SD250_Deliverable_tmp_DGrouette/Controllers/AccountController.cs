@@ -123,8 +123,10 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             // Bassically removing the cookie, in the goofiest way possible.
             if (Request.Cookies["UserAuthCookie"] != null)
             {
-                HttpCookie myCookie = new HttpCookie("UserAuthCookie");
-                myCookie.Expires = DateTime.Now.AddDays(-1d);
+                HttpCookie myCookie = new HttpCookie("UserAuthCookie")
+                {
+                    Expires = DateTime.Now.AddDays(-1d)
+                };
                 Response.Cookies.Add(myCookie);
             }
             else

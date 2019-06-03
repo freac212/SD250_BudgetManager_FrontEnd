@@ -503,16 +503,8 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             var authHeader = new AuthenticationHeaderValue("Bearer", token);
             httpClient.DefaultRequestHeaders.Authorization = authHeader; // Set this on login I guess???
 
-            var parameters = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("null", null),
-            };
-
-            // x-www-form-encoded tag, just like in post man, so that the data is sent on the body.
-            var encodedParameters = new FormUrlEncodedContent(parameters);
-
             // Handling lack of connection??? try catch?
-            var response = httpClient.PostAsync(url, encodedParameters).Result;
+            var response = httpClient.PostAsync(url, null).Result;
 
             if (ErrorHelpers.IsNotFound(response.StatusCode, TempData))
                 return RedirectToAction("Index", "Household");
@@ -537,7 +529,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 TempData.Add("LoginMessage", "Error in joining household");
                 TempData.Add("MessageColour", "danger");
 
-                return RedirectToAction("Index", "Household");
+                return RedirectToAction("LogIn", "Account"); // Could I somehow have the user login, then have it redirect to join?? ++Q
             }
         }
 
