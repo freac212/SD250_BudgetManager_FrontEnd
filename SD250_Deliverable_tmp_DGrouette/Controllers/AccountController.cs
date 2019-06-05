@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using SD220_Deliverable_1_DGrouette.Models.Filters;
 using SD250_Deliverable_tmp_DGrouette.Models.Domain;
+using SD250_Deliverable_tmp_DGrouette.Models.Helpers;
 using SD250_Deliverable_tmp_DGrouette.Models.Views;
+using SD250_Deliverable_tmp_DGrouette.Models.Wrappers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,16 +16,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 {
     public class AccountController : Controller
     {
-        // Save api url here orrrr?
-        private const string APIURL = "http://localhost:52445";
-        private static readonly HttpClient httpClient = new HttpClient(); // Apparently this was reccomended!
-
-        // Tasks: 
-        // > Register User
-        // > Login w/ token auth
-        // > Change Password
-        // > Recover Lost Password
-
         // GET: RegisterUser
         [HttpGet]
         public ActionResult RegisterUser()
@@ -38,7 +30,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             if (!ModelState.IsValid)
                 return View();
 
-            var url = $"{APIURL}/api/Account/Register";
+            var url = $"{ProjectConstants.APIURL}/api/Account/Register";
 
             var parameters = new List<KeyValuePair<string, string>>
             {
@@ -51,17 +43,10 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             var encodedParameters = new FormUrlEncodedContent(parameters);
 
             // Handling lack of connection??? try catch?
-            var response = httpClient.PostAsync(url, encodedParameters).Result;
-
-            // Check ITE
-            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
-            {
-                return View("Internal Server Error");
-            }
+            var response = HttpClientContext.httpClient.PostAsync(url, encodedParameters).Result;
 
             if (response.IsSuccessStatusCode)
             {
-                // Should 'login' the user here
                 if (!LogUserIn(registerUserViewModel.Email, registerUserViewModel.Password))
                 {
                     ModelState.AddModelError("", "There was an error logging you in..");
@@ -70,25 +55,16 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 else
                 {
                     TempData.Add("LoginMessage", "Account Created!");
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Household");
                 }
             }
             else
             {
-                var responseResult = response.Content.ReadAsStringAsync().Result;
-                var errorData = JsonConvert.DeserializeObject<ErrorData>(responseResult);
-
-                foreach (var item in errorData.ModelState)
-                {
-                    foreach (var ItemValue in item.Value)
-                    {
-                        ModelState.AddModelError(string.Empty, ItemValue);
-                    }
-                }
-
+                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
                 return View();
             }
         }
+
 
         // GET: Login
         [HttpGet]
@@ -106,7 +82,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (LogUserIn(loginViewModel.Email, loginViewModel.Password))
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Household");
             }
             else
             {
@@ -115,7 +91,8 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             }
         }
 
-        // GET: Login
+
+        // GET: LogOut
         [HttpGet]
         [Auth]
         public ActionResult LogOut()
@@ -133,14 +110,11 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             {
                 TempData.Add("LoginMessage", "Error logging out..");
                 TempData.Add("MessageColour", "danger");
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Household");
             }
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Household");
         }
-
-
-
 
 
         // GET: RecoverPassword
@@ -155,10 +129,9 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         public ActionResult RecoverPassword(RecoverPasswordViewModel passwordViewModel)
         {
             if (!ModelState.IsValid)
-                return View();
+                return View(); // Not sending the viewModel because passwords
 
-            var url = $"{APIURL}/api/Account/SendResetPassword";
-            //var callbackUrl = Url.Content("~/Account/ResetPassword/");
+            var url = $"{ProjectConstants.APIURL}/api/Account/SendResetPassword";
             var callbackUrl = Url.Action("ResetPassword", "Account", null, Request.Url.Scheme);
 
             var parameters = new List<KeyValuePair<string, string>>
@@ -167,39 +140,17 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 new KeyValuePair<string, string>("Url", callbackUrl)
             };
 
-            // x-www-form-encoded tag, just like in post man, so that the data is sent on the body.
             var encodedParameters = new FormUrlEncodedContent(parameters);
-
-            // Handling lack of connection??? try catch?
-            var response = httpClient.PostAsync(url, encodedParameters).Result;
-
-            // Check ITE
-            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
-            {
-                TempData.Add("LoginMessage", "Internal Server Error");
-                TempData.Add("MessageColour", "danger");
-                return RedirectToAction("Index", "Home");
-            }
+            var response = HttpClientContext.httpClient.PostAsync(url, encodedParameters).Result;
 
             if (response.IsSuccessStatusCode)
             {
                 TempData.Add("LoginMessage", $"If that account exists, an email has been sent!");
-                //TempData.Add("MessageColour", "danger");
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Household");
             }
             else
             {
-                var responseResult = response.Content.ReadAsStringAsync().Result;
-                var errorData = JsonConvert.DeserializeObject<ErrorData>(responseResult);
-
-                foreach (var item in errorData.ModelState)
-                {
-                    foreach (var ItemValue in item.Value)
-                    {
-                        ModelState.AddModelError(string.Empty, ItemValue);
-                    }
-                }
-
+                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
                 return View();
             }
         }
@@ -215,7 +166,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             {
                 TempData.Add("LoginMessage", "Error");
                 TempData.Add("MessageColour", "danger");
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Household");
             }
             else
             {
@@ -236,7 +187,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             if (!ModelState.IsValid)
                 return View();
 
-            var url = $"{APIURL}/api/Account/ResetPassword";
+            var url = $"{ProjectConstants.APIURL}/api/Account/ResetPassword";
 
             var parameters = new List<KeyValuePair<string, string>>
             {
@@ -246,19 +197,8 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 new KeyValuePair<string, string>("Email", resetPasswordViewModel.Email)
             };
 
-            // x-www-form-encoded tag, just like in post man, so that the data is sent on the body.
             var encodedParameters = new FormUrlEncodedContent(parameters);
-
-            // Handling lack of connection??? try catch?
-            var response = httpClient.PostAsync(url, encodedParameters).Result;
-
-            // Check ITE
-            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
-            {
-                TempData.Add("LoginMessage", "Internal Server Error");
-                TempData.Add("MessageColour", "danger");
-                return RedirectToAction("Index", "Home");
-            }
+            var response = HttpClientContext.httpClient.PostAsync(url, encodedParameters).Result;
 
             if (response.IsSuccessStatusCode)
             {
@@ -271,22 +211,12 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 else
                 {
                     TempData.Add("LoginMessage", "Password Changed!");
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Household");
                 }
             }
             else
             {
-                var responseResult = response.Content.ReadAsStringAsync().Result;
-                var errorData = JsonConvert.DeserializeObject<ErrorData>(responseResult);
-
-                foreach (var item in errorData.ModelState)
-                {
-                    foreach (var ItemValue in item.Value)
-                    {
-                        ModelState.AddModelError(string.Empty, ItemValue);
-                    }
-                }
-
+                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
                 return View();
             }
         }
@@ -308,7 +238,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             if (!ModelState.IsValid)
                 return View();
 
-            var url = $"{APIURL}/api/Account/ChangePassword";
+            var url = $"{ProjectConstants.APIURL}/api/Account/ChangePassword";
 
             var token = Request.Cookies["UserAuthCookie"].Value;
 
@@ -319,51 +249,27 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 new KeyValuePair<string, string>("ConfirmPassword", changePasswordViewModel.ConfirmPassword),
             };
 
-            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            HttpClientContext.httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            // x-www-form-encoded tag, just like in post man, so that the data is sent on the body.
             var encodedParameters = new FormUrlEncodedContent(parameters);
-
-            // Handling lack of connection??? try catch?
-            var response = httpClient.PostAsync(url, encodedParameters).Result;
-
-            // Check ITE
-            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
-            {
-                TempData.Add("LoginMessage", "Internal Server Error");
-                TempData.Add("MessageColour", "danger");
-                return RedirectToAction("Index", "Home");
-            }
+            var response = HttpClientContext.httpClient.PostAsync(url, encodedParameters).Result;
 
             if (response.IsSuccessStatusCode)
             {
                 TempData.Add("LoginMessage", "Password Changed!");
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Household");
             }
             else
             {
-                var responseResult = response.Content.ReadAsStringAsync().Result;
-                var errorData = JsonConvert.DeserializeObject<ErrorData>(responseResult);
-
-                {
-                    foreach (var item in errorData.ModelState)
-                    {
-                        foreach (var ItemValue in item.Value)
-                        {
-                            ModelState.AddModelError(string.Empty, ItemValue);
-                        }
-                    }
-                }
-
+                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
                 return View();
             }
         }
 
 
-
         private bool LogUserIn(string email, string password)
         {
-            var url = $"{APIURL}/token";
+            var url = $"{ProjectConstants.APIURL}/token";
             var grantType = "password";
 
             var parameters = new List<KeyValuePair<string, string>>
@@ -375,7 +281,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             var encodedValues = new FormUrlEncodedContent(parameters);
 
-            var response = httpClient.PostAsync(url, encodedValues).Result;
+            var response = HttpClientContext.httpClient.PostAsync(url, encodedValues).Result;
 
             if (response.IsSuccessStatusCode)
             {
@@ -391,6 +297,10 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
                 Response.Cookies.Add(cookie);
                 Response.Cookies.Add(cookieUser);
+
+                var token = Request.Cookies["UserAuthCookie"].Value;
+                var authHeader = new AuthenticationHeaderValue("Bearer", token);
+                HttpClientContext.httpClient.DefaultRequestHeaders.Authorization = authHeader;
 
                 return true;
             }

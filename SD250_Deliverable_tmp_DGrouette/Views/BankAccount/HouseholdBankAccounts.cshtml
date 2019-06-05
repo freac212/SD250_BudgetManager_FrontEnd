@@ -1,0 +1,88 @@
+﻿@model BankAccountListViewModel
+@{
+    ViewBag.Title = "Accounts";
+}
+
+@* List of Bank Accounts per a single household *@
+@section Scripts {
+    <script type="text/javascript" src="~/Content/js/plugins/jquery/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#bankAccountTable').DataTable({
+                "columnDefs": [
+                    {
+                        "targets": [4],
+                        "orderable": false
+                    }
+                ]
+            });
+
+        });
+
+/**/</script>
+}
+
+@section css {
+    <link href="~/Content/css/jquery.dataTables.min.css" rel="stylesheet" />
+}
+
+@if (Model.IsHouseholdOwner)
+{
+    <button class="btn btn-default" onclick="location.href='@Url.Action("Create", "BankAccount", new { Id = Model.HouseholdId})'">
+        Create New Account
+    </button>
+}
+
+<table id="bankAccountTable" class="table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Balance</th>
+            <th>Date Created</th>
+            <th>Date Updated</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.BankAccounts)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.Description</td>
+                <td>@item.Balance</td>
+                <td>@item.DateCreated</td>
+                <td>@item.DateUpdated</td>
+                <td style="display: flex; flex-direction: column; align-content: space-between;">
+                    @if (Model.IsHouseholdOwner)
+                    {
+                        <a href="@Url.Action("Edit",  new { Id = item.Id })" class="household-item-buttons"><i class="fas fa-edit"></i></a>
+
+                        using (Html.BeginForm("Delete", "BankAccount", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            @*@Html.Hidden("Id", item.Id)*@
+                            <input id="Id" name="Id" type="hidden" value="@item.Id">
+                            <input id="householdId" name="householdId" type="hidden" value="@item.HouseholdId">
+                            @*@Html.Hidden("householdId", item.HouseholdId)*@
+                            @*<input type="submit" value="Create" class="btn btn-default"/>*@
+                            <a href="#" onclick="$(this).closest('form').submit()" class="household-item-buttons household-item-delete"><i class="fas fa-times"></i></a>
+                        }
+
+                        using (Html.BeginForm("UpdateBalance", "BankAccount", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input id="Id" name="Id" type="hidden" value="@item.Id">
+                            <input id="householdId" name="householdId" type="hidden" value="@item.HouseholdId">
+                            <a href="#" onclick="$(this).closest('form').submit()" class="household-item-buttons household-item-delete"><i class="fas fa-dollar-sign"></i></a>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@Html.ActionLink("Back to Households", "Index", "Household")

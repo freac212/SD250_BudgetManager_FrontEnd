@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -6,9 +7,9 @@ using System.Web.ModelBinding;
 
 namespace SD250_Deliverable_tmp_DGrouette.Models.Domain
 {
-    public class ErrorData
+    public class ErrorDataSingleMessage
     {
-        public string Message { get; set; }
-        public Dictionary<string, string[]> ModelState { get; set; }
+        [JsonProperty("error")]
+        public string Error { get; set; }
     }
 }

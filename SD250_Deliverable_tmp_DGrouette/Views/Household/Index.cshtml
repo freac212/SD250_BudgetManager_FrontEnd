@@ -1,7 +1,7 @@
 ﻿@model List<HouseholdViewModel>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Your Households";
 }
 
 @section Scripts {
@@ -33,41 +33,71 @@
             <th>Description</th>
             <th>Users</th>
             <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>@item.Id</td>
-                <td>@item.Name</td>
-                <td>@item.Description</td>
-                <td>
-                    <div class="info-box">
-                        <!-- Apply any bg-* class to to the icon to color it -->
-                        <a href="@Url.Action("Users",  new { Id = item.Id })" class="info-box-icon bg-red"><i class="fa fa-user"></i></a>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Users</span>
-                            <span class="info-box-number">@item.HouseholdUsers.Count</span>
-                        </div><!-- /.info-box-content -->
-                    </div><!-- /.info-box -->
-                    @*@Html.ActionLink($"Users: {item.HouseholdUsers.Count}", "Users", new { Id = item.Id })*@
-                </td>
-                <td>
-                    @if (item.IsCreator)
-                    {
-                        <a href="@Url.Action("Edit",  new { Id = item.Id })"><i class="fa fa-edit"></i></a>
-                        @*@Html.ActionLink("Edit", "Edit", new { Id = item.Id })*@
-                        <a href="@Url.Action("Delete",  new { Id = item.Id })"><i class="fa fa-times"></i></a>
-                        @*@Html.ActionLink("Delete", "Delete", new { Id = item.Id })*@
-                    }
-                    @if (item.IsMember && !item.IsCreator)
-                    {
-                        @*@Html.ActionLink("Leave", "Leave", new { Id = item.Id })*@
-                        <a href="@Url.Action("Leave",  new { Id = item.Id })"><i class="fa fa-sign-out"></i></a>
-                    }
-                </td>
-            </tr>
+        <tr>
+            <td>@item.Id</td>
+            <td>@item.Name</td>
+            <td>@item.Description</td>
+            <td>
+                <div class="info-box">
+                    <!-- Apply any bg-* class to to the icon to color it -->
+                    <a href="@Url.Action("Users",  new { Id = item.Id })" class="info-box-icon bg-red"><i class="fas fa-user"></i></a>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Users</span>
+                        <span class="info-box-number">@item.HouseholdUsers.Count</span>
+                    </div><!-- /.info-box-content -->
+                </div><!-- /.info-box -->
+                @*@Html.ActionLink($"Users: {item.HouseholdUsers.Count}", "Users", new { Id = item.Id })*@
+            </td>
+            <td>
+                <div class="info-box">
+                    <a href="@Url.Action("HouseholdCategories", "Category",  new { Id = item.Id })" class="info-box-icon bg-blue"><i class="fas fa-list-alt"></i></a>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Categories</span>
+                        <span class="info-box-number">@item.Categories.Count</span>
+                    </div><!-- /.info-box-content -->
+                </div><!-- /.info-box -->
+            </td>
+            <td>
+                <div class="info-box">
+                    <a href="@Url.Action("HouseholdBankAccounts", "BankAccount",  new { Id = item.Id })" class="info-box-icon bg-yellow"><i class="fas fa-hand-holding-usd"></i></a>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Accounts</span>
+                        <span class="info-box-number">@item.BankAccounts.Count</span>
+                    </div><!-- /.info-box-content -->
+                </div><!-- /.info-box -->
+            </td>
+            <td>
+                <div class="info-box">
+                    <a href="@Url.Action("HouseholdTransactions", "Transaction",  new { Id = item.Id })" class="info-box-icon bg-green"><i class="fas fa-file-invoice-dollar"></i></a>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Transactions</span>
+                        <span class="info-box-number">@item.Transactions.Count</span>
+                    </div><!-- /.info-box-content -->
+                </div><!-- /.info-box -->
+            </td>
+            <td style="display: flex; flex-direction: column; align-content: space-between;">
+                @if (item.IsCreator)
+                {
+                    <a href="@Url.Action("Edit",  new { Id = item.Id })" class="household-item-buttons"><i class="fas fa-edit"></i></a>
+                    @*@Html.ActionLink("Edit", "Edit", new { Id = item.Id })*@
+                    <a href="@Url.Action("Delete",  new { Id = item.Id })" class="household-item-buttons household-item-delete"><i class="fas fa-times"></i></a>
+                    @*@Html.ActionLink("Delete", "Delete", new { Id = item.Id })*@
+                }
+                @if (item.IsMember && !item.IsCreator)
+                {
+                    @*@Html.ActionLink("Leave", "Leave", new { Id = item.Id })*@
+                    <a href="@Url.Action("Leave", new { Id = item.Id })" class="household-item-buttons"><i class="fas fa-sign-out"></i></a>
+                }
+            </td>
+        </tr>
         }
     </tbody>
 </table>

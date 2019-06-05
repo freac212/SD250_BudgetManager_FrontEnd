@@ -3,6 +3,7 @@ using SD220_Deliverable_1_DGrouette.Models.Filters;
 using SD250_Deliverable_tmp_DGrouette.Models.Domain;
 using SD250_Deliverable_tmp_DGrouette.Models.Helpers;
 using SD250_Deliverable_tmp_DGrouette.Models.Views;
+using SD250_Deliverable_tmp_DGrouette.Models.Wrappers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,19 +17,11 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 {
     public class HouseholdController : Controller
     {
-        private const string APIURL = "http://localhost:52445";
-        private static readonly HttpClient httpClient = new HttpClient(); // Apparently this was reccomended! <- Will solve the fact that I'm
-
-        /*
-         *Household Management
-         *  Create household
-         *  Edit household
-         *  View households -> Created and households in
-         *  View users in household
-         *  Invite users to join household
-         *  Join household 
-         *  Leave household
-         */
+        // BankAccount -> Categories -> Transactions ++Q ++Q ++Q
+        // for the household detail page, show only the last 10 transactions.
+        // All users of the household can see the details page.
+        // Convert all deletes to forms instead of links (because form validation)
+        // All tempdatas should be accessing through dictionary usage i.e tempData["blah"] = "blah"
 
         // GET: Household
         // > View households -> Created and households in
@@ -36,50 +29,28 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            var url = $"{APIURL}/api/household/getall";
+            var url = $"{ProjectConstants.APIURL}/api/household/getall";
 
             var token = Request.Cookies["UserAuthCookie"].Value;
             var authHeader = new AuthenticationHeaderValue("Bearer", token);
-            httpClient.DefaultRequestHeaders.Authorization = authHeader;
+            HttpClientContext.httpClient.DefaultRequestHeaders.Authorization = authHeader;
+
+            //HttpClientContext.httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}"); // Old way
 
             // Handling lack of connection??? try catch?
-            var response = httpClient.GetAsync(url).Result;
-
-            if (ErrorHelpers.IsNotFound(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsInternalServerError(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsUnAuthorized(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-
-            var responseResult = response.Content.ReadAsStringAsync().Result;
+            var response = HttpClientContext.httpClient.GetAsync(url).Result;
 
             if (response.IsSuccessStatusCode)
             {
+                var responseResult = response.Content.ReadAsStringAsync().Result;
+
                 var datas = JsonConvert.DeserializeObject<List<HouseholdViewModel>>(responseResult);
 
                 return View(datas);
             }
             else
             {
-                var errorData = JsonConvert.DeserializeObject<ErrorData>(responseResult);
-
-                if (errorData.ModelState != null)
-                {
-                    foreach (var item in errorData.ModelState)
-                    {
-                        foreach (var ItemValue in item.Value)
-                        {
-                            ModelState.AddModelError(string.Empty, ItemValue);
-                        }
-                    }
-                }
-                else
-                {
-                    TempData.Add("LoginMessage", "Unknown Error, call an admin or something");
-                    TempData.Add("MessageColour", "danger");
-                }
-
+                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
                 return View();
             }
         }
@@ -98,15 +69,9 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         public ActionResult Create(CreateHouseholdViewModel createHouseholdViewModel)
         {
             if (!ModelState.IsValid)
-                return View();
+                return View(createHouseholdViewModel);
 
-            var url = $"{APIURL}/api/household/create";
-
-            var token = Request.Cookies["UserAuthCookie"].Value;
-            var authHeader = new AuthenticationHeaderValue("Bearer", token);
-            httpClient.DefaultRequestHeaders.Authorization = authHeader; // Set this on login I guess???
-
-            //httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            var url = $"{ProjectConstants.APIURL}/api/household/create";
 
             var parameters = new List<KeyValuePair<string, string>>
             {
@@ -116,16 +81,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             // x-www-form-encoded tag, just like in post man, so that the data is sent on the body.
             var encodedParameters = new FormUrlEncodedContent(parameters);
-
-            // Handling lack of connection??? try catch?
-            var response = httpClient.PostAsync(url, encodedParameters).Result;
-
-            if (ErrorHelpers.IsNotFound(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsInternalServerError(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsUnAuthorized(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
+            var response = HttpClientContext.httpClient.PostAsync(url, encodedParameters).Result;
 
             if (response.IsSuccessStatusCode)
             {
@@ -134,26 +90,8 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             }
             else
             {
-                var responseResult = response.Content.ReadAsStringAsync().Result;
-                var errorData = JsonConvert.DeserializeObject<ErrorData>(responseResult);
-
-                if (errorData.ModelState != null)
-                {
-                    foreach (var item in errorData.ModelState)
-                    {
-                        foreach (var ItemValue in item.Value)
-                        {
-                            ModelState.AddModelError(string.Empty, ItemValue);
-                        }
-                    }
-                }
-                else
-                {
-                    TempData.Add("LoginMessage", "Unknown Error, call an admin or something");
-                    TempData.Add("MessageColour", "danger");
-                }
-
-                return View();
+                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
+                return View(createHouseholdViewModel);
             }
         }
 
@@ -170,51 +108,21 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 return RedirectToAction("Index", "Household");
             }
 
-            // get the household from the DB, I could pass the local data, but if someone else edits the household, I'd prefer the data is straight form the source.
-            var url = $"{APIURL}/api/household/getbyid/{Id}";
+            var url = $"{ProjectConstants.APIURL}/api/household/getbyid/{Id}";
 
-            var token = Request.Cookies["UserAuthCookie"].Value;
-            var authHeader = new AuthenticationHeaderValue("Bearer", token);
-            httpClient.DefaultRequestHeaders.Authorization = authHeader; // Set this on login I guess???
-
-
-            // Handling lack of connection??? try catch?
-            var response = httpClient.GetAsync(url).Result;
-
-            if (ErrorHelpers.IsNotFound(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsInternalServerError(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsUnAuthorized(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-
-            var responseResult = response.Content.ReadAsStringAsync().Result;
+            var response = HttpClientContext.httpClient.GetAsync(url).Result;
 
             if (response.IsSuccessStatusCode)
             {
+                var responseResult = response.Content.ReadAsStringAsync().Result;
+
                 var data = JsonConvert.DeserializeObject<EditHouseholdViewModel>(responseResult);
 
                 return View(data);
             }
             else
             {
-                var errorData = JsonConvert.DeserializeObject<ErrorData>(responseResult);
-
-                if (errorData.ModelState != null)
-                {
-                    foreach (var item in errorData.ModelState)
-                    {
-                        foreach (var ItemValue in item.Value)
-                        {
-                            ModelState.AddModelError(string.Empty, ItemValue);
-                        }
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, errorData.Message);
-                }
-
+                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
                 return View();
             }
         }
@@ -225,15 +133,9 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         public ActionResult Edit(EditHouseholdViewModel editHouseholdViewModel)
         {
             if (!ModelState.IsValid)
-                return View();
+                return View(editHouseholdViewModel);
 
-            var url = $"{APIURL}/api/household/edit/{editHouseholdViewModel.Id}";
-
-            var token = Request.Cookies["UserAuthCookie"].Value;
-            var authHeader = new AuthenticationHeaderValue("Bearer", token);
-            httpClient.DefaultRequestHeaders.Authorization = authHeader; // Set this on login I guess???
-
-            //httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            var url = $"{ProjectConstants.APIURL}/api/household/edit/{editHouseholdViewModel.Id}";
 
             var parameters = new List<KeyValuePair<string, string>>
             {
@@ -241,49 +143,22 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 new KeyValuePair<string, string>("Description", editHouseholdViewModel.Description)
             };
 
-            // x-www-form-encoded tag, just like in post man, so that the data is sent on the body.
             var encodedParameters = new FormUrlEncodedContent(parameters);
-
-            // Handling lack of connection??? try catch?
-            var response = httpClient.PostAsync(url, encodedParameters).Result;
-
-            if (ErrorHelpers.IsNotFound(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsInternalServerError(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsUnAuthorized(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
+            var response = HttpClientContext.httpClient.PostAsync(url, encodedParameters).Result;
 
             if (response.IsSuccessStatusCode)
             {
-                TempData.Add("LoginMessage", "Household Edited!");
+                TempData.Add("LoginMessage", $"Household '{editHouseholdViewModel.Name}' Edited!");
                 return RedirectToAction("Index", "Household");
             }
             else
             {
-                var responseResult = response.Content.ReadAsStringAsync().Result;
-                var errorData = JsonConvert.DeserializeObject<ErrorData>(responseResult);
-
-                if (errorData != null)
-                {
-                    foreach (var item in errorData.ModelState)
-                    {
-                        foreach (var ItemValue in item.Value)
-                        {
-                            ModelState.AddModelError(string.Empty, ItemValue);
-                        }
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, errorData.Message);
-                }
-
-                return View();
+                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
+                return View(editHouseholdViewModel);
             }
         }
 
-        // POST: Delete // Is a get here okay? I tried Delete but that didn't work all too well.
+        // GET: Delete // Is a get here okay? I tried Delete but that didn't work all too well.
         [Auth]
         [HttpGet]
         public ActionResult Delete(int? Id)
@@ -291,23 +166,9 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             if (ErrorHelpers.IdIsInvalid(Id, TempData))
                 return RedirectToAction("Index", "Household");
 
-            var url = $"{APIURL}/api/household/delete/{Id}";
+            var url = $"{ProjectConstants.APIURL}/api/household/delete/{Id}";
 
-            var token = Request.Cookies["UserAuthCookie"].Value;
-            var authHeader = new AuthenticationHeaderValue("Bearer", token);
-            httpClient.DefaultRequestHeaders.Authorization = authHeader; // Set this on login I guess???
-
-            //httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-            // Handling lack of connection??? try catch?
-            var response = httpClient.DeleteAsync(url).Result;
-
-            if (ErrorHelpers.IsNotFound(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsInternalServerError(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsUnAuthorized(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
+            var response = HttpClientContext.httpClient.DeleteAsync(url).Result;
 
             if (response.IsSuccessStatusCode)
             {
@@ -316,17 +177,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             }
             else
             {
-                var responseResult = response.Content.ReadAsStringAsync().Result;
-                var errorData = JsonConvert.DeserializeObject<ErrorData>(responseResult);
-
-                foreach (var item in errorData.ModelState)
-                {
-                    foreach (var ItemValue in item.Value)
-                    {
-                        ModelState.AddModelError(string.Empty, ItemValue);
-                    }
-                }
-
+                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
                 return View();
             }
         }
@@ -344,22 +195,9 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 return RedirectToAction("Index", "Household");
             }
 
-            var url = $"{APIURL}/api/household/getallusers/{Id}";
+            var url = $"{ProjectConstants.APIURL}/api/household/getallusers/{Id}";
 
-            var token = Request.Cookies["UserAuthCookie"].Value;
-            var authHeader = new AuthenticationHeaderValue("Bearer", token);
-            httpClient.DefaultRequestHeaders.Authorization = authHeader; // Set this on login I guess???
-
-            // Handling lack of connection??? try catch?
-            var response = httpClient.GetAsync(url).Result;
-
-            if (ErrorHelpers.IsNotFound(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsInternalServerError(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsUnAuthorized(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-
+            var response = HttpClientContext.httpClient.GetAsync(url).Result;
             var responseResult = response.Content.ReadAsStringAsync().Result;
 
             if (response.IsSuccessStatusCode)
@@ -370,26 +208,14 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 {
                     UserViewModels = datas,
                     HouseholdId = (int)Id,
-                    IsCreator = IsUserCreator((int)Id)
+                    IsCreator = IsUserCreator((int)Id, Request, TempData)
                 };
 
                 return View(viewModel);
             }
             else
             {
-                var errorData = JsonConvert.DeserializeObject<ErrorData>(responseResult);
-
-                foreach (var item in errorData.ModelState)
-                {
-                    foreach (var ItemValue in item.Value)
-                    {
-                        ModelState.AddModelError(string.Empty, ItemValue);
-                    }
-                }
-
-                TempData.Add("LoginMessage", "Error in getting users");
-                TempData.Add("MessageColour", "danger");
-
+                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
                 return View();
             }
         }
@@ -419,13 +245,9 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         public ActionResult Invite(InviteUserViewModel inviteUserViewModel)
         {
             if (!ModelState.IsValid)
-                return View();
+                return View(inviteUserViewModel);
 
-            var url = $"{APIURL}/api/household/invite/{inviteUserViewModel.HouseholdId}";
-
-            var token = Request.Cookies["UserAuthCookie"].Value;
-            var authHeader = new AuthenticationHeaderValue("Bearer", token);
-            httpClient.DefaultRequestHeaders.Authorization = authHeader; // Set this on login I guess???
+            var url = $"{ProjectConstants.APIURL}/api/household/invite/{inviteUserViewModel.HouseholdId}";
 
             var callbackUrl = Url.Action("Join", "Household", new { Id = inviteUserViewModel.HouseholdId }, Request.Url.Scheme);
 
@@ -436,35 +258,8 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             };
 
-            // x-www-form-encoded tag, just like in post man, so that the data is sent on the body.
             var encodedParameters = new FormUrlEncodedContent(parameters);
-
-            // Handling lack of connection??? try catch?
-            var response = httpClient.PostAsync(url, encodedParameters).Result;
-
-            // Check ITE
-            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
-            {
-                TempData.Add("LoginMessage", "Internal Server Error, try again later");
-                TempData.Add("MessageColour", "danger");
-                return View(inviteUserViewModel);
-            }
-
-            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                TempData.Add("LoginMessage", "User does not exist on the system");
-                TempData.Add("MessageColour", "danger");
-                return View(inviteUserViewModel);
-            }
-
-            if (ErrorHelpers.IsNotFound(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsInternalServerError(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsUnAuthorized(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-
-            var responseResult = response.Content.ReadAsStringAsync().Result;
+            var response = HttpClientContext.httpClient.PostAsync(url, encodedParameters).Result;
 
             if (response.IsSuccessStatusCode)
             {
@@ -473,13 +268,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             }
             else
             {
-                var errorData = JsonConvert.DeserializeObject<ErrorData>(responseResult);
-
-                ModelState.AddModelError(string.Empty, errorData.Message);
-
-                TempData.Add("LoginMessage", "Error in inviting users");
-                TempData.Add("MessageColour", "danger");
-
+                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
                 return View(inviteUserViewModel);
             }
         }
@@ -497,23 +286,9 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 return RedirectToAction("Index", "Household");
             }
 
-            var url = $"{APIURL}/api/household/join/{Id}";
+            var url = $"{ProjectConstants.APIURL}/api/household/join/{Id}";
 
-            var token = Request.Cookies["UserAuthCookie"].Value;
-            var authHeader = new AuthenticationHeaderValue("Bearer", token);
-            httpClient.DefaultRequestHeaders.Authorization = authHeader; // Set this on login I guess???
-
-            // Handling lack of connection??? try catch?
-            var response = httpClient.PostAsync(url, null).Result;
-
-            if (ErrorHelpers.IsNotFound(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsInternalServerError(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsUnAuthorized(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-
-            var responseResult = response.Content.ReadAsStringAsync().Result;
+            var response = HttpClientContext.httpClient.PostAsync(url, null).Result;
 
             if (response.IsSuccessStatusCode)
             {
@@ -522,13 +297,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             }
             else
             {
-                var errorData = JsonConvert.DeserializeObject<ErrorData>(responseResult);
-
-                ModelState.AddModelError(string.Empty, errorData.Message);
-
-                TempData.Add("LoginMessage", "Error in joining household");
-                TempData.Add("MessageColour", "danger");
-
+                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
                 return RedirectToAction("LogIn", "Account"); // Could I somehow have the user login, then have it redirect to join?? ++Q
             }
         }
@@ -541,23 +310,9 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             if (ErrorHelpers.IdIsInvalid(Id, TempData))
                 return RedirectToAction("Index", "Household");
 
-            var url = $"{APIURL}/api/household/leave/{Id}";
+            var url = $"{ProjectConstants.APIURL}/api/household/leave/{Id}";
 
-            var token = Request.Cookies["UserAuthCookie"].Value;
-            var authHeader = new AuthenticationHeaderValue("Bearer", token);
-            httpClient.DefaultRequestHeaders.Authorization = authHeader;
-
-            // Handling lack of connection??? try catch?
-            var response = httpClient.GetAsync(url).Result;
-
-            if (ErrorHelpers.IsNotFound(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsInternalServerError(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsUnAuthorized(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-
-            var responseResult = response.Content.ReadAsStringAsync().Result;
+            var response = HttpClientContext.httpClient.GetAsync(url).Result;
 
             if (response.IsSuccessStatusCode)
             {
@@ -566,13 +321,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             }
             else
             {
-                var errorData = JsonConvert.DeserializeObject<ErrorData>(responseResult);
-
-                ModelState.AddModelError(string.Empty, errorData.Message);
-
-                TempData.Add("LoginMessage", "Error in leaving household");
-                TempData.Add("MessageColour", "danger");
-
+                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
                 return RedirectToAction("Index", "Household");
             }
         }
@@ -582,22 +331,9 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         [HttpGet]
         public ActionResult Invites()
         {
-            var url = $"{APIURL}/api/household/getallinvites";
+            var url = $"{ProjectConstants.APIURL}/api/household/getallinvites";
 
-            var token = Request.Cookies["UserAuthCookie"].Value;
-            var authHeader = new AuthenticationHeaderValue("Bearer", token);
-            httpClient.DefaultRequestHeaders.Authorization = authHeader;
-
-            // Handling lack of connection??? try catch?
-            var response = httpClient.GetAsync(url).Result;
-
-            if (ErrorHelpers.IsNotFound(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsInternalServerError(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-            if (ErrorHelpers.IsUnAuthorized(response.StatusCode, TempData))
-                return RedirectToAction("Index", "Household");
-
+            var response = HttpClientContext.httpClient.GetAsync(url).Result;
             var responseResult = response.Content.ReadAsStringAsync().Result;
 
             if (response.IsSuccessStatusCode)
@@ -608,39 +344,26 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             }
             else
             {
-                var errorData = JsonConvert.DeserializeObject<ErrorData>(responseResult);
-
-                foreach (var item in errorData.ModelState)
-                {
-                    foreach (var ItemValue in item.Value)
-                    {
-                        ModelState.AddModelError(string.Empty, ItemValue);
-                    }
-                }
-
-                TempData.Add("LoginMessage", "Error in getting households");
-                TempData.Add("MessageColour", "danger");
-
+                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
                 return View();
             }
         }
 
-        private bool IsUserCreator(int householdId)
+        public static bool IsUserCreator(int householdId, HttpRequestBase request, TempDataDictionary tempData)
         {
-            var url = $"{APIURL}/api/household/isusercreator/{householdId}";
+            var url = $"{ProjectConstants.APIURL}/api/household/isusercreator/{householdId}";
 
-            var token = Request.Cookies["UserAuthCookie"].Value;
+            var token = request.Cookies["UserAuthCookie"].Value;
             var authHeader = new AuthenticationHeaderValue("Bearer", token);
-            httpClient.DefaultRequestHeaders.Authorization = authHeader;
+            HttpClientContext.httpClient.DefaultRequestHeaders.Authorization = authHeader;
 
-            // Handling lack of connection??? try catch?
-            var response = httpClient.GetAsync(url).Result;
+            var response = HttpClientContext.httpClient.GetAsync(url).Result;
 
-            if (ErrorHelpers.IsNotFound(response.StatusCode, TempData))
+            if (ErrorHelpers.IsNotFound(response.StatusCode, tempData))
                 return false;
-            if (ErrorHelpers.IsInternalServerError(response.StatusCode, TempData))
+            if (ErrorHelpers.IsInternalServerError(response.StatusCode, tempData))
                 return false;
-            if (ErrorHelpers.IsUnAuthorized(response.StatusCode, TempData))
+            if (ErrorHelpers.IsUnAuthorized(response.StatusCode, tempData))
                 return false;
 
             var responseResult = response.Content.ReadAsStringAsync().Result;

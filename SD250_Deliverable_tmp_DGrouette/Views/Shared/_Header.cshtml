@@ -23,6 +23,7 @@
     @* BEGIN Header *@
     <nav class="navbar navbar-static-top" role="navigation">
         <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+            <i class="fa fa-bars"></i>
             <span class="sr-only">Toggle navigation</span>
         </a>
         <div class="navbar-custom-menu">
@@ -93,8 +94,8 @@
                                     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                                     <div class="form-group">
                                         @*@Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })*@
-                                        @Html.Label("Email", new { @class = "control-label col-md-2", style = "width: unset;" })
-                                        <div class="col-xs-10">
+                                        @Html.Label("Email", new { @class = "control-label col-xs-2", style = "width: unset;" })
+                                        <div class="col-xs-12">
                                             @Html.TextBox("Email", null, new { @class = "form-control" })
                                             @*@Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })*@
                                         </div>
@@ -102,8 +103,8 @@
 
                                     <div class="form-group" style="">
                                         @*@Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "control-label col-md-2" })*@
-                                        @Html.Label("Password", new { @class = "control-label col-md-2", style = "width: unset;" })
-                                        <div class="col-xs-10">
+                                        @Html.Label("Password", new { @class = "control-label col-xs-2", style = "width: unset;" })
+                                        <div class="col-xs-12">
                                             @Html.TextBox("Password", null, new { @class = "form-control password", type = "password" })
                                             @*@Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control password", type = "password" } })*@
                                         </div>

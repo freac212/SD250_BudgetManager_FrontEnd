@@ -1,0 +1,17 @@
+﻿.household-item-buttons {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+
+    width: 45px; 
+    height: 45px; 
+    text-align: center; 
+    font-size: 30px;
+}
+
+.household-item-delete {
+    font-size: 40px;
+    position: relative;
+    left: -4%;
+}
