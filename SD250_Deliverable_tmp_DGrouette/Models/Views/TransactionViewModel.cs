@@ -16,7 +16,9 @@ namespace SD250_Deliverable_tmp_DGrouette.Models.Views
         public DateTime? DateUpdated { get; set; }
         public bool IsVoid { get; set; }
         public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
         public string CreatorId { get; set; }
         public int BankAccountId { get; set; }
+        public string BankAccountName { get; set; }
     }
 }

@@ -1,0 +1,103 @@
+﻿@model TransactionListViewModel
+@{
+    ViewBag.Title = $"Transactions";
+}
+
+@* List of Transactions per a single household *@
+@section Scripts {
+    <script type="text/javascript" src="~/Content/js/plugins/jquery/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#transactionTable').DataTable({
+                "columnDefs": [
+                    {
+                        "targets": [10],
+                        "orderable": false
+                    }
+                ]
+            });
+
+        });
+
+/**/</script>
+}
+
+@section css {
+    <link href="~/Content/css/jquery.dataTables.min.css" rel="stylesheet" />
+}
+
+@if (Model.IsHouseholdOwner)
+{
+    <button class="btn btn-default" onclick="location.href='@Url.Action("Create", "Transaction", new { Id = Model.HouseholdId})'">
+        Create New Transaction
+    </button>
+}
+
+<table id="transactionTable" class="table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Date Of Transaction</th>
+            <th>Date Created</th>
+            <th>Date Updated</th>
+            <th>Amount</th>
+            <th>Category</th>
+            <th>Account</th>
+            <th>Voided</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Transactions)
+        {
+        <tr>
+            <td>@item.Id</td>
+            <td>@item.Title</td>
+            <td>@item.Description</td>
+            <td>@item.Date</td>
+            <td>@item.DateCreated</td>
+            <td>@item.DateUpdated</td>
+            <td>@item.Amount</td>
+            <td>@item.CategoryName</td>
+            <td>@item.BankAccountName</td>
+            <td>
+                @if (item.IsVoid)
+                {
+                    <bold>Void</bold>
+                }
+                else
+                {
+                    <bold>Not Void</bold>
+                }
+            </td>
+            <td style="display: flex; flex-direction: column; align-content: space-between;">
+                @if (Model.IsHouseholdOwner) // Or is owner of transaction
+                {
+                    <a href="@Url.Action("Edit",  new { Id = item.Id })" class="household-item-buttons"><i class="fas fa-edit"></i></a>
+                    @*@Html.ActionLink("Edit", "Edit", new { Id = item.Id })*@
+                    using (Html.BeginForm("Delete", "Transaction", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input id="Id" name="Id" type="hidden" value="@item.Id">
+                        <input id="householdId" name="householdId" type="hidden" value="@Model.HouseholdId">
+                        <a href="#" onclick="$(this).closest('form').submit()" class="household-item-buttons household-item-delete"><i class="fas fa-times"></i></a>
+                    }
+
+                    using (Html.BeginForm("SwitchVoid", "Transaction", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input id="Id" name="Id" type="hidden" value="@item.Id">
+                        <input id="householdId" name="householdId" type="hidden" value="@Model.HouseholdId">
+                        <a href="#" onclick="$(this).closest('form').submit()" class="household-item-buttons household-item-delete"><i class="fas fa-ban"></i></a>
+                    }
+                }
+
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+@Html.ActionLink("Back to Households", "Index", "Household")
