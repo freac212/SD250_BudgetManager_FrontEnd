@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using SD220_Deliverable_1_DGrouette.Models.Filters;
+using SD250_Deliverable_tmp_DGrouette.Models.Bindings;
 using SD250_Deliverable_tmp_DGrouette.Models.Domain;
 using SD250_Deliverable_tmp_DGrouette.Models.Helpers;
 using SD250_Deliverable_tmp_DGrouette.Models.Views;
@@ -377,6 +378,72 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             {
                 return false;
             }
+        }
+
+        [Auth]
+        [HttpGet]
+        public ActionResult Details(int? Id)
+        {
+            // HouseholdId
+            // Last 10 Transactions of those accounts/ grouped by category.
+
+            if (Id is null)
+            {
+                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("MessageColour", "danger");
+                return RedirectToAction("Index", "Household");
+            }
+
+            var url = $"{ProjectConstants.APIURL}/api/household/getbyid/{Id}";
+
+            var token = Request.Cookies["UserAuthCookie"].Value;
+            var authHeader = new AuthenticationHeaderValue("Bearer", token);
+            HttpClientContext.httpClient.DefaultRequestHeaders.Authorization = authHeader;
+
+            // Handling lack of connection??? try catch?
+            var response = HttpClientContext.httpClient.GetAsync(url).Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseResult = response.Content.ReadAsStringAsync().Result;
+
+                var datas = JsonConvert.DeserializeObject<HouseholdBindingModel>(responseResult);
+                // Organize data into HouseholdDetailsViewModel
+                var householdDetails = new HouseholdDetailsViewModel()
+                {
+                    NetSum = datas.BankAccounts.Sum(acnt => acnt.Balance),
+                    HouseholdId = (int)Id,
+                    BankAccountViewModels = datas.BankAccounts.Select(p => new BankAccountTransactionsViewModel()
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Description = p.Description,
+                        Balance = p.Balance,
+                        TransactionViewModels = datas.Transactions.Where(trnsctn => trnsctn.BankAccountId == p.Id).Select(x => new TransactionViewModel()
+                        {
+                            Id = x.Id,
+                            Title = x.Title,
+                            Description = x.Description,
+                            Date = x.Date,
+                            DateCreated = x.DateCreated,
+                            DateUpdated = x.DateUpdated,
+                            IsVoid = x.IsVoid,
+                            Amount = x.Amount,
+                            CreatorId = x.CreatorId,
+                            CategoryId = x.CategoryId,
+                            CategoryName = HouseholdHelpers.GetCategoryName(x.CategoryId, Request)
+                        }).GroupBy(transaction => transaction.CategoryName).ToList()
+                    }).ToList()
+                };
+
+                return View(householdDetails);
+            }
+            else
+            {
+                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
+                return View();
+            }
+
         }
     }
 }

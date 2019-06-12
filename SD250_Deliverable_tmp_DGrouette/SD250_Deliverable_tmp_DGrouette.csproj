@@ -186,6 +186,7 @@
     <Content Include="Views\Transaction\HouseholdTransactions.cshtml" />
     <Content Include="Views\Transaction\Create.cshtml" />
     <Content Include="Views\Transaction\Edit.cshtml" />
+    <Content Include="Views\Household\Details.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -199,6 +200,7 @@
     <Compile Include="Controllers\TransactionController.cs" />
     <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\HouseholdController.cs" />
+    <Compile Include="Models\Bindings\HouseholdBindingModel.cs" />
     <Compile Include="Models\Domain\ErrorDataSingleMessage.cs" />
     <Compile Include="Models\Domain\ErrorDataModelState.cs" />
     <Compile Include="Models\Domain\LoginData.cs" />
@@ -209,6 +211,7 @@
     <Compile Include="Models\Views\BankAccountViewModel.cs" />
     <Compile Include="Models\Views\BankAccountListViewModel.cs" />
     <Compile Include="Models\Views\CreateTransactionViewModel.cs" />
+    <Compile Include="Models\Views\HouseholdDetailsViewModel.cs" />
     <Compile Include="Models\Views\SelectListBankAccountViewModel.cs" />
     <Compile Include="Models\Views\SelectListCategoryViewModel.cs" />
     <Compile Include="Models\Views\TransactionListViewModel.cs" />

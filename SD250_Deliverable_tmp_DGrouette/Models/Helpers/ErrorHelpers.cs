@@ -2,6 +2,7 @@
 using SD250_Deliverable_tmp_DGrouette.Models.Domain;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -115,6 +116,9 @@ namespace SD250_Deliverable_tmp_DGrouette.Models.Helpers
             var responseResult = response.Content.ReadAsStringAsync().Result;
             var errorData = JsonConvert.DeserializeObject<ErrorDataModelState>(responseResult);
 
+            tempData.Add("LoginMessage", "Error");
+            tempData.Add("MessageColour", "danger");
+
             if (errorData != null)
             {
                 if (errorData.ModelState != null)
@@ -131,24 +135,30 @@ namespace SD250_Deliverable_tmp_DGrouette.Models.Helpers
                 {
                     modelState.AddModelError(string.Empty, errorData.Message);
 
-                    tempData.Add("LoginMessage", "Error");
-                    tempData.Add("MessageColour", "danger");
+                    tempData["LoginMessage"] = "Error";
+                    tempData["MessageColour"] = "danger";
                 }
-
-                return;
             }
 
             var errorDataSingleMessage = JsonConvert.DeserializeObject<ErrorDataSingleMessage>(responseResult);
-            if (errorDataSingleMessage != null)
+            if (errorDataSingleMessage.Error != null)
             {
-                tempData.Add("LoginMessage", errorDataSingleMessage.Error);
-                tempData.Add("MessageColour", "danger");
+                tempData["LoginMessage"] = errorDataSingleMessage.Error;
+                tempData["MessageColour"] = "danger";
+                return;
+            }
+
+            dynamic errorDataBadRequest = JsonConvert.DeserializeObject<ExpandoObject>(responseResult);
+            if (errorDataBadRequest.Message != null)
+            {
+                tempData["LoginMessage"] = errorDataBadRequest.Message;
+                tempData["MessageColour"] = "danger";
                 return;
             }
 
             // Thirdly, handling errors that shouldn't technically exist
-            tempData.Add("LoginMessage", "Unknown Error: Contact an admin or something");
-            tempData.Add("MessageColour", "danger");
+            tempData["LoginMessage"] = "Unknown Error: Contact an admin or something";
+            tempData["MessageColour"] = "danger";
             return;
 
         }

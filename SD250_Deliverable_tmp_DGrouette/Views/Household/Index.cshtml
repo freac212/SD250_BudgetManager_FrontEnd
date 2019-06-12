@@ -11,7 +11,7 @@
             $('#myTable').DataTable({
                 "columnDefs": [
                     {
-                        "targets": [4],
+                        "targets": [4,5,6,7],
                         "orderable": false
                     }
                 ]
@@ -96,6 +96,7 @@
                     @*@Html.ActionLink("Leave", "Leave", new { Id = item.Id })*@
                     <a href="@Url.Action("Leave", new { Id = item.Id })" class="household-item-buttons"><i class="fas fa-sign-out"></i></a>
                 }
+                <a href="@Url.Action("Details", new { Id = item.Id })" class="household-item-buttons"><i class="fas fa-info"></i></a>
             </td>
         </tr>
         }
