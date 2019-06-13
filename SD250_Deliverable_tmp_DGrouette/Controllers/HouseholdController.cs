@@ -18,11 +18,11 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 {
     public class HouseholdController : Controller
     {
-        // BankAccount -> Categories -> Transactions ++Q ++Q ++Q
-        // for the household detail page, show only the last 10 transactions.
-        // All users of the household can see the details page.
-        // Convert all deletes to forms instead of links (because form validation)
-        // All tempdatas should be accessing through dictionary usage i.e tempData["blah"] = "blah"
+        // Rule of cleaning this up -> Go through each method, make sure they're only returning/ create/ whatever/ what they should be, look very carefully!
+        // Also, clean up the viewModels, the Create views are being used in edits, others being used elsewhere so, clean that up.
+        // Run through each views to make sure they look right, I know some buttons are pretty big so adjust those.
+        // JQuery Arrow images
+        // Does the Catagory, transaction, and account management rely on households? Or are they independant lists? (Because if they were I'd add lists to the side bar and have to rewrite a few queries)
 
         // GET: Household
         // > View households -> Created and households in
@@ -385,7 +385,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         public ActionResult Details(int? Id)
         {
             // HouseholdId
-            // Last 10 Transactions of those accounts/ grouped by category.
+            // Last 10 Transactions of those accounts/ grouped by category. -> Do that on that backend
 
             if (Id is null)
             {
