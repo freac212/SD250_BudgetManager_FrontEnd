@@ -16,6 +16,7 @@ using System.Web.Mvc;
 
 namespace SD250_Deliverable_tmp_DGrouette.Controllers
 {
+    [Auth]
     public class HouseholdController : Controller
     {
         // Rule of cleaning this up -> Go through each method, make sure they're only returning/ create/ whatever/ what they should be, look very carefully!
@@ -26,7 +27,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
         // GET: Household
         // > View households -> Created and households in
-        [Auth]
         [HttpGet]
         public ActionResult Index()
         {
@@ -35,8 +35,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             var token = Request.Cookies["UserAuthCookie"].Value;
             var authHeader = new AuthenticationHeaderValue("Bearer", token);
             HttpClientContext.httpClient.DefaultRequestHeaders.Authorization = authHeader;
-
-            //HttpClientContext.httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}"); // Old way
 
             // Handling lack of connection??? try catch?
             var response = HttpClientContext.httpClient.GetAsync(url).Result;
@@ -57,7 +55,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         }
 
         // GET: CreateHousehold
-        [Auth]
         [HttpGet]
         public ActionResult Create()
         {
@@ -65,7 +62,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         }
 
         // POST: CreateHousehold
-        [Auth]
         [HttpPost]
         public ActionResult Create(CreateHouseholdViewModel createHouseholdViewModel)
         {
@@ -98,7 +94,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
 
         // GET: Edit
-        [Auth]
         [HttpGet]
         public ActionResult Edit(int? Id)
         {
@@ -110,15 +105,12 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             }
 
             var url = $"{ProjectConstants.APIURL}/api/household/getbyid/{Id}";
-
             var response = HttpClientContext.httpClient.GetAsync(url).Result;
 
             if (response.IsSuccessStatusCode)
             {
                 var responseResult = response.Content.ReadAsStringAsync().Result;
-
                 var data = JsonConvert.DeserializeObject<EditHouseholdViewModel>(responseResult);
-
                 return View(data);
             }
             else
@@ -129,7 +121,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         }
 
         // POST: Edit
-        [Auth]
         [HttpPost]
         public ActionResult Edit(EditHouseholdViewModel editHouseholdViewModel)
         {
@@ -159,8 +150,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             }
         }
 
-        // GET: Delete // Is a get here okay? I tried Delete but that didn't work all too well.
-        [Auth]
+        // GET: Delete
         [HttpGet]
         public ActionResult Delete(int? Id)
         {
@@ -185,16 +175,11 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
         // GET: HouseholdUsers
         // > View households -> Created and households in
-        [Auth]
         [HttpGet]
         public ActionResult Users(int? Id)
         {
-            if (Id is null)
-            {
-                TempData.Add("LoginMessage", "Improper Id");
-                TempData.Add("MessageColour", "danger");
+            if (ErrorHelpers.IdIsInvalid(Id, TempData))
                 return RedirectToAction("Index", "Household");
-            }
 
             var url = $"{ProjectConstants.APIURL}/api/household/getallusers/{Id}";
 
@@ -209,7 +194,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 {
                     UserViewModels = datas,
                     HouseholdId = (int)Id,
-                    IsCreator = IsUserCreator((int)Id, Request, TempData)
+                    IsCreator = HouseholdHelpers.IsUserCreator((int)Id, Request, TempData)
                 };
 
                 return View(viewModel);
@@ -222,16 +207,12 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         }
 
         // GET: Invite
-        [Auth]
         [HttpGet]
         public ActionResult Invite(int? HouseholdId)
         {
-            if (HouseholdId is null)
-            {
-                TempData.Add("LoginMessage", "Improper Id");
-                TempData.Add("MessageColour", "danger");
+            if (ErrorHelpers.IdIsInvalid(HouseholdId, TempData))
                 return RedirectToAction("Index", "Household");
-            }
+
             var viewModel = new InviteUserViewModel
             {
                 HouseholdId = (int)HouseholdId
@@ -241,7 +222,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         }
 
         // POST: Invite
-        [Auth]
         [HttpPost]
         public ActionResult Invite(InviteUserViewModel inviteUserViewModel)
         {
@@ -276,7 +256,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
 
         // GET: Join
-        [Auth]
         [HttpGet]
         public ActionResult Join(int? Id)
         {
@@ -299,12 +278,11 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             else
             {
                 ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return RedirectToAction("LogIn", "Account"); // Could I somehow have the user login, then have it redirect to join?? ++Q
+                return RedirectToAction("LogIn", "Account");
             }
         }
 
         // GET: Leave
-        [Auth]
         [HttpGet]
         public ActionResult Leave(int? Id)
         {
@@ -328,7 +306,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         }
 
         // GET: Invites
-        [Auth]
         [HttpGet]
         public ActionResult Invites()
         {
@@ -350,37 +327,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             }
         }
 
-        public static bool IsUserCreator(int householdId, HttpRequestBase request, TempDataDictionary tempData)
-        {
-            var url = $"{ProjectConstants.APIURL}/api/household/isusercreator/{householdId}";
-
-            var token = request.Cookies["UserAuthCookie"].Value;
-            var authHeader = new AuthenticationHeaderValue("Bearer", token);
-            HttpClientContext.httpClient.DefaultRequestHeaders.Authorization = authHeader;
-
-            var response = HttpClientContext.httpClient.GetAsync(url).Result;
-
-            if (ErrorHelpers.IsNotFound(response.StatusCode, tempData))
-                return false;
-            if (ErrorHelpers.IsInternalServerError(response.StatusCode, tempData))
-                return false;
-            if (ErrorHelpers.IsUnAuthorized(response.StatusCode, tempData))
-                return false;
-
-            var responseResult = response.Content.ReadAsStringAsync().Result;
-
-            if (response.IsSuccessStatusCode)
-            {
-                var data = JsonConvert.DeserializeObject<IsCreatorViewModel>(responseResult);
-                return data.IsCreator;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        [Auth]
         [HttpGet]
         public ActionResult Details(int? Id)
         {

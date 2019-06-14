@@ -7,8 +7,10 @@ using System.Web.Mvc;
 
 namespace SD250_Deliverable_tmp_DGrouette.Models.Views
 {
-    public class CreateTransactionViewModel
+    public class EditTransactionViewModel
     {
+        [Required]
+        public string Id { get; set; } // Only required for editing
         [Required]
         public string Title { get; set; }
         [Required]
@@ -19,9 +21,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Models.Views
         public decimal Amount { get; set; }
 
         [Required(ErrorMessage = "Please choose a Category")]
-        public int? CategoryId { get; set; }
-        [Required(ErrorMessage = "Please choose a Bank Account")]
-        public int? BankAccountId { get; set; }
+        public int CategoryId { get; set; }
         [Required]
         public int HouseholdId { get; set; }
 

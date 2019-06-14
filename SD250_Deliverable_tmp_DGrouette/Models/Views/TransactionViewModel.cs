@@ -20,5 +20,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Models.Views
         public string CreatorId { get; set; }
         public int BankAccountId { get; set; }
         public string BankAccountName { get; set; }
+        public int HouseholdId { get; set; }
+        public bool UserCanEdit { get; set; }
     }
 }

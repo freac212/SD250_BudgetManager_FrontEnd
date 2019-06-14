@@ -88,23 +88,23 @@ namespace SD250_Deliverable_tmp_DGrouette.Models.Helpers
 
         public static void HandleResponseErrors(HttpResponseMessage response, TempDataDictionary tempData, ModelStateDictionary modelState, string ItemName = "Item")
         {
+            if (!tempData.ContainsKey("MessageColour"))
+                tempData["MessageColour"] = "danger";
+
             // Firstly, handling errors that wont have messages.
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                tempData.Add("LoginMessage", $"{ItemName} not found");
-                tempData.Add("MessageColour", "danger");
+                tempData["LoginMessage"] =  $"{ItemName} not found";
                 return;
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
             {
-                tempData.Add("LoginMessage", "Internal Server Error: Try again later");
-                tempData.Add("MessageColour", "danger");
+                tempData["LoginMessage"] = "Internal Server Error: Try again later";
                 return;
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
-                tempData.Add("LoginMessage", "Error: Not Authorized");
-                tempData.Add("MessageColour", "danger");
+                tempData["LoginMessage"] = "Error: Not Authorized";
                 return;
             }
 
@@ -116,8 +116,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Models.Helpers
             var responseResult = response.Content.ReadAsStringAsync().Result;
             var errorData = JsonConvert.DeserializeObject<ErrorDataModelState>(responseResult);
 
-            tempData.Add("LoginMessage", "Error");
-            tempData.Add("MessageColour", "danger");
+            tempData["LoginMessage"] = "Error";
 
             if (errorData != null)
             {
@@ -136,7 +135,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Models.Helpers
                     modelState.AddModelError(string.Empty, errorData.Message);
 
                     tempData["LoginMessage"] = "Error";
-                    tempData["MessageColour"] = "danger";
                 }
             }
 
@@ -144,7 +142,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Models.Helpers
             if (errorDataSingleMessage.Error != null)
             {
                 tempData["LoginMessage"] = errorDataSingleMessage.Error;
-                tempData["MessageColour"] = "danger";
                 return;
             }
 
@@ -152,13 +149,11 @@ namespace SD250_Deliverable_tmp_DGrouette.Models.Helpers
             if (errorDataBadRequest.Message != null)
             {
                 tempData["LoginMessage"] = errorDataBadRequest.Message;
-                tempData["MessageColour"] = "danger";
                 return;
             }
 
             // Thirdly, handling errors that shouldn't technically exist
             tempData["LoginMessage"] = "Unknown Error: Contact an admin or something";
-            tempData["MessageColour"] = "danger";
             return;
 
         }

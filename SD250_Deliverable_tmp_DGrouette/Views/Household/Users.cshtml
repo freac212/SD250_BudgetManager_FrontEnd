@@ -27,6 +27,10 @@
         {
             @Html.ActionLink($"Invite more users!", "Invite", new { HouseholdId = Model.HouseholdId })
         }
+        else
+        {
+            @Html.ActionLink($"Leave this household for some reason!", "Leave", new { Id = Model.HouseholdId })
+        }
     </div><!-- /.info-box-content -->
 </div><!-- /.info-box -->
 

@@ -20,6 +20,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         // Other members of the household can only create, edit, delete, their own transactionss
 
         // GET: HouseholdTransactions
+        [HttpGet]
         public ActionResult HouseholdTransactions(int? Id)
         {
             if (Id is null)
@@ -48,13 +49,14 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 {
                     item.CategoryName = HouseholdHelpers.GetCategoryName(item.CategoryId, Request);
                     item.BankAccountName = HouseholdHelpers.GetBankAccountName(item.BankAccountId, Request);
+                    item.UserCanEdit = TransactionHelpers.IsUserCreator(item.Id, Request, TempData);
                 }
 
                 var viewModel = new TransactionListViewModel
                 {
                     Transactions = datas,
                     HouseholdId = (int)Id,
-                    IsHouseholdOwner = HouseholdController.IsUserCreator((int)Id, Request, TempData)
+                    IsHouseholdOwnerOrMember = HouseholdHelpers.IsUserCreatorOrMember((int)Id, Request, TempData)
                 };
                 return View(viewModel);
             }
@@ -64,6 +66,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 return View();
             }
         }
+
 
         // GET: Create
         [HttpGet]
@@ -77,80 +80,36 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 return RedirectToAction("Index", "Household");
             }
 
-            // Get bankaccounts for *blah* household
-            var bankAccounts = HouseholdHelpers.GetBankAccounts(Id, Request);
-
-            // Get categories for *blah* household
-            var categories = HouseholdHelpers.GetCategories(Id, Request);
-
-            if (bankAccounts is null && categories is null)
-            {
-                TempData.Add("LoginMessage", "There's no bank accounts or categories on this household yet. Create them before making a transaction!");
-                TempData.Add("MessageColour", "danger");
-                return RedirectToAction("Index", "Household");
-            }
-            else if (bankAccounts is null)
-            {
-                TempData.Add("LoginMessage", "There's no bank accounts on this household yet. Create one to make a transaction!");
-                TempData.Add("MessageColour", "danger");
-                return RedirectToAction("Index", "Household");
-            }
-            else if (categories is null)
-            {
-                TempData.Add("LoginMessage", "There's no categories on this household yet. Create one to make a transaction!");
-                TempData.Add("MessageColour", "danger");
-                return RedirectToAction("Index", "Household");
-            }
-
             var viewModel = new CreateTransactionViewModel()
             {
-                BankAccounts = bankAccounts.Select(p =>
-                    new SelectListItem()
-                    {
-                        Text = p.Name,
-                        Value = p.Id.ToString()
-                    }).ToList(),
-
-                Categories = categories.Select(p =>
-                    new SelectListItem()
-                    {
-                        Text = p.Name,
-                        Value = p.Id.ToString()
-                    }).ToList(),
                 HouseholdId = (int)Id,
                 Date = DateTime.Now
             };
 
+            TransactionHelpers.SetDropDownLists(viewModel, Request);
+
+            if (TransactionHelpers.BankAccntOrCategoriesIsNull(viewModel, TempData))
+                return RedirectToAction("Index", "Household");
+
             return View(viewModel);
         }
+
 
         // POST: Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(CreateTransactionViewModel transactionViewModel)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || transactionViewModel.BankAccountId is null || transactionViewModel.CategoryId is null)
             {
-                // ++Q Problem with this, a person can change the hidden households id, invalidate the form, and get different accounts and categories back.
-                var bankAccounts = HouseholdHelpers.GetBankAccounts(transactionViewModel.HouseholdId, Request);
-                var categories = HouseholdHelpers.GetCategories(transactionViewModel.HouseholdId, Request);
+                TransactionHelpers.SetDropDownLists(transactionViewModel, Request);
 
-                transactionViewModel.BankAccounts = bankAccounts.Select(p =>
-                     new SelectListItem()
-                     {
-                         Text = p.Name,
-                         Value = p.Id.ToString()
-                     }).ToList();
-
-                transactionViewModel.Categories = categories.Select(p =>
-                    new SelectListItem()
-                    {
-                        Text = p.Name,
-                        Value = p.Id.ToString()
-                    }).ToList();
+                if (TransactionHelpers.BankAccntOrCategoriesIsNull(transactionViewModel, TempData))
+                    return RedirectToAction("Index", "Household");
 
                 return View(transactionViewModel);
             }
+
 
             var url = $"{ProjectConstants.APIURL}/api/transaction/create/{transactionViewModel.BankAccountId}";
 
@@ -173,24 +132,11 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             }
             else
             {
+                TransactionHelpers.SetDropDownLists(transactionViewModel, Request);
+                if (TransactionHelpers.BankAccntOrCategoriesIsNull(transactionViewModel, TempData))
+                    return RedirectToAction("Index", "Household");
+
                 ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-
-                var bankAccounts = HouseholdHelpers.GetBankAccounts(transactionViewModel.HouseholdId, Request);
-                var categories = HouseholdHelpers.GetCategories(transactionViewModel.HouseholdId, Request);
-
-                transactionViewModel.BankAccounts = bankAccounts.Select(p =>
-                     new SelectListItem()
-                     {
-                         Text = p.Name,
-                         Value = p.Id.ToString()
-                     }).ToList();
-
-                transactionViewModel.Categories = categories.Select(p =>
-                    new SelectListItem()
-                    {
-                        Text = p.Name,
-                        Value = p.Id.ToString()
-                    }).ToList();
 
                 return View(transactionViewModel);
             }
@@ -216,25 +162,16 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             {
                 var responseResult = response.Content.ReadAsStringAsync().Result;
 
-                var data = JsonConvert.DeserializeObject<CreateTransactionViewModel>(responseResult);
+                var data = JsonConvert.DeserializeObject<EditTransactionViewModel>(responseResult);
 
-                var bankAccounts = HouseholdHelpers.GetBankAccounts(Id, Request);
-                var categories = HouseholdHelpers.GetCategories(Id, Request);
+                TransactionHelpers.SetCategoryDropDownList(data, Request);
 
-                data.BankAccounts = bankAccounts.Select(p =>
-                     new SelectListItem()
-                     {
-                         Text = p.Name,
-                         Value = p.Id.ToString()
-                     }).ToList();
-
-                data.Categories = categories.Select(p =>
-                    new SelectListItem()
-                    {
-                        Text = p.Name,
-                        Value = p.Id.ToString()
-                    }).ToList();
-                data.HouseholdId = (int)Id;
+                if (data.Categories is null)
+                {
+                    TempData.Add("LoginMessage", "Error: Categories missing");
+                    TempData.Add("MessageColour", "danger");
+                    return RedirectToAction("Index", "Household");
+                }
 
                 return View(data);
             }
@@ -245,30 +182,22 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             }
         }
 
+
         // POST: Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(CreateTransactionViewModel transactionViewModel)
+        public ActionResult Edit(EditTransactionViewModel transactionViewModel)
         {
             if (!ModelState.IsValid)
             {
-                // ++Q Problem with this, a person can change the hidden households id, invalidate the form, and get different accounts and categories back.
-                var bankAccounts = HouseholdHelpers.GetBankAccounts(transactionViewModel.HouseholdId, Request);
-                var categories = HouseholdHelpers.GetCategories(transactionViewModel.HouseholdId, Request);
+                TransactionHelpers.SetCategoryDropDownList(transactionViewModel, Request);
 
-                transactionViewModel.BankAccounts = bankAccounts.Select(p =>
-                     new SelectListItem()
-                     {
-                         Text = p.Name,
-                         Value = p.Id.ToString()
-                     }).ToList();
-
-                transactionViewModel.Categories = categories.Select(p =>
-                    new SelectListItem()
-                    {
-                        Text = p.Name,
-                        Value = p.Id.ToString()
-                    }).ToList();
+                if (transactionViewModel.Categories is null)
+                {
+                    TempData.Add("LoginMessage", "Error: Categories missing");
+                    TempData.Add("MessageColour", "danger");
+                    return RedirectToAction("Index", "Household");
+                }
 
                 return View(transactionViewModel);
             }
@@ -295,26 +224,20 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             else
             {
                 ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                var bankAccounts = HouseholdHelpers.GetBankAccounts(transactionViewModel.HouseholdId, Request);
-                var categories = HouseholdHelpers.GetCategories(transactionViewModel.HouseholdId, Request);
 
-                transactionViewModel.BankAccounts = bankAccounts.Select(p =>
-                     new SelectListItem()
-                     {
-                         Text = p.Name,
-                         Value = p.Id.ToString()
-                     }).ToList();
+                TransactionHelpers.SetCategoryDropDownList(transactionViewModel, Request);
 
-                transactionViewModel.Categories = categories.Select(p =>
-                    new SelectListItem()
-                    {
-                        Text = p.Name,
-                        Value = p.Id.ToString()
-                    }).ToList();
+                if (transactionViewModel.Categories is null)
+                {
+                    TempData.Add("LoginMessage", "Error: Categories missing");
+                    TempData.Add("MessageColour", "danger");
+                    return RedirectToAction("Index", "Household");
+                }
 
                 return View(transactionViewModel);
             }
         }
+
 
         // POST: Delete
         [HttpPost]
@@ -345,6 +268,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             }
         }
 
+
         // POST: SwitchVoid
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -364,7 +288,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData["LoginMessage"] = "Transaction is now Void!";
+                TempData["LoginMessage"] = $"Transaction's void state has been changed successfully!";
                 return RedirectToAction("HouseholdTransactions", "Transaction", new { Id = householdId });
             }
             else

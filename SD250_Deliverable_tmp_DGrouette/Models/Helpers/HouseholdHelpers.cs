@@ -7,11 +7,72 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Web;
+using System.Web.Mvc;
 
 namespace SD250_Deliverable_tmp_DGrouette.Models.Helpers
 {
     public class HouseholdHelpers
     {
+        public static bool IsUserCreator(int householdId, HttpRequestBase request, TempDataDictionary tempData)
+        {
+            var url = $"{ProjectConstants.APIURL}/api/household/isusercreator/{householdId}";
+
+            var token = request.Cookies["UserAuthCookie"].Value;
+            var authHeader = new AuthenticationHeaderValue("Bearer", token);
+            HttpClientContext.httpClient.DefaultRequestHeaders.Authorization = authHeader;
+
+            var response = HttpClientContext.httpClient.GetAsync(url).Result;
+
+            if (ErrorHelpers.IsNotFound(response.StatusCode, tempData))
+                return false;
+            if (ErrorHelpers.IsInternalServerError(response.StatusCode, tempData))
+                return false;
+            if (ErrorHelpers.IsUnAuthorized(response.StatusCode, tempData))
+                return false;
+
+            var responseResult = response.Content.ReadAsStringAsync().Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                var data = JsonConvert.DeserializeObject<IsCreatorViewModel>(responseResult);
+                return data.IsCreator;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public static bool IsUserCreatorOrMember(int householdId, HttpRequestBase request, TempDataDictionary tempData)
+        {
+            var url = $"{ProjectConstants.APIURL}/api/household/isusercreatorormember/{householdId}";
+
+            var token = request.Cookies["UserAuthCookie"].Value;
+            var authHeader = new AuthenticationHeaderValue("Bearer", token);
+            HttpClientContext.httpClient.DefaultRequestHeaders.Authorization = authHeader;
+
+            var response = HttpClientContext.httpClient.GetAsync(url).Result;
+
+            if (ErrorHelpers.IsNotFound(response.StatusCode, tempData))
+                return false;
+            if (ErrorHelpers.IsInternalServerError(response.StatusCode, tempData))
+                return false;
+            if (ErrorHelpers.IsUnAuthorized(response.StatusCode, tempData))
+                return false;
+
+            var responseResult = response.Content.ReadAsStringAsync().Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                var data = JsonConvert.DeserializeObject<IsCreatorOrMemberViewModel>(responseResult);
+                return data.IsCreatorOrMember;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public static List<CategoryViewModel> GetCategories(int? householdId, HttpRequestBase Request)
         {
             if (householdId is null)

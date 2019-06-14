@@ -3,15 +3,21 @@
     flex-direction: column;
     align-content: center;
     justify-content: center;
-
-    width: 45px; 
-    height: 45px; 
-    text-align: center; 
-    font-size: 30px;
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    font-size: 25px;
 }
 
 .household-item-delete {
-    font-size: 40px;
+    font-size: 25px;
     position: relative;
     left: -4%;
+}
+
+.household-item-buttons-cont {
+    height: inherit; 
+    display: flex; 
+    flex-direction: column; 
+    align-content: space-between;
 }

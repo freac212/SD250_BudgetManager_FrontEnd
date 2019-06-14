@@ -47,7 +47,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 {
                     Categories = datas,
                     HouseholdId = (int)Id,
-                    IsHouseholdOwner = HouseholdController.IsUserCreator((int)Id, Request, TempData)
+                    IsHouseholdOwner = HouseholdHelpers.IsUserCreator((int)Id, Request, TempData)
                 };
                 return View(viewModel);
             }

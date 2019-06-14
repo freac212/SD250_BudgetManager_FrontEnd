@@ -249,8 +249,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 new KeyValuePair<string, string>("ConfirmPassword", changePasswordViewModel.ConfirmPassword),
             };
 
-            HttpClientContext.httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
             var encodedParameters = new FormUrlEncodedContent(parameters);
             var response = HttpClientContext.httpClient.PostAsync(url, encodedParameters).Result;
 

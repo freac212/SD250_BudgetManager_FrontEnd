@@ -11,7 +11,7 @@
             $('#bankAccountTable').DataTable({
                 "columnDefs": [
                     {
-                        "targets": [4],
+                        "targets": [6],
                         "orderable": false
                     }
                 ]
@@ -55,7 +55,7 @@
                 <td>@item.Balance</td>
                 <td>@item.DateCreated</td>
                 <td>@item.DateUpdated</td>
-                <td style="display: flex; flex-direction: column; align-content: space-between;">
+                <td class="household-item-buttons-cont">
                     @if (Model.IsHouseholdOwner)
                     {
                         <a href="@Url.Action("Edit",  new { Id = item.Id })" class="household-item-buttons"><i class="fas fa-edit"></i></a>

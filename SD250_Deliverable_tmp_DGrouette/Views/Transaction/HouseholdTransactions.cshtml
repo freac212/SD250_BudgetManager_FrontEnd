@@ -26,7 +26,7 @@
     <link href="~/Content/css/jquery.dataTables.min.css" rel="stylesheet" />
 }
 
-@if (Model.IsHouseholdOwner)
+@if (Model.IsHouseholdOwnerOrMember)
 {
     <button class="btn btn-default" onclick="location.href='@Url.Action("Create", "Transaction", new { Id = Model.HouseholdId})'">
         Create New Transaction
@@ -72,8 +72,8 @@
                     <bold>Not Void</bold>
                 }
             </td>
-            <td style="display: flex; flex-direction: column; align-content: space-between;">
-                @if (Model.IsHouseholdOwner) // Or is owner of transaction
+            <td class="household-item-buttons-cont">
+                @if (item.UserCanEdit) // Or is owner of transaction
                 {
                     <a href="@Url.Action("Edit",  new { Id = item.Id })" class="household-item-buttons"><i class="fas fa-edit"></i></a>
                     @*@Html.ActionLink("Edit", "Edit", new { Id = item.Id })*@
