@@ -54,7 +54,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 }
                 else
                 {
-                    TempData.Add("LoginMessage", "Account Created!");
+                    TempData.Add("Message", "Account Created!");
                     return RedirectToAction("Index", "Household");
                 }
             }
@@ -108,7 +108,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             }
             else
             {
-                TempData.Add("LoginMessage", "Error logging out..");
+                TempData.Add("Message", "Error logging out..");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -145,7 +145,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData.Add("LoginMessage", $"If that account exists, an email has been sent!");
+                TempData.Add("Message", $"If that account exists, an email has been sent!");
                 return RedirectToAction("Index", "Household");
             }
             else
@@ -164,7 +164,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         {
             if (String.IsNullOrEmpty(token) || String.IsNullOrEmpty(email))
             {
-                TempData.Add("LoginMessage", "Error");
+                TempData.Add("Message", "Error");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -210,7 +210,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 }
                 else
                 {
-                    TempData.Add("LoginMessage", "Password Changed!");
+                    TempData.Add("Message", "Password Changed!");
                     return RedirectToAction("Index", "Household");
                 }
             }
@@ -254,7 +254,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData.Add("LoginMessage", "Password Changed!");
+                TempData.Add("Message", "Password Changed!");
                 return RedirectToAction("Index", "Household");
             }
             else

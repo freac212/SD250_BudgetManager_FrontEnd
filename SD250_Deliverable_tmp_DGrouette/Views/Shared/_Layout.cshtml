@@ -52,7 +52,7 @@
                     }
                 }
 
-                @if (TempData["LoginMessage"] != null)
+                @if (TempData["Message"] != null)
                 {
                     <div class="box box-solid box-@messageColour">
                         <div class="box-header with-border">
@@ -62,7 +62,7 @@
                             </div><!-- /.box-tools -->
                         </div><!-- /.box-header -->
                         <div class="box-body">
-                            @TempData["LoginMessage"]
+                            @TempData["Message"]
                         </div><!-- /.box-body -->
                     </div><!-- /.box -->
                 }

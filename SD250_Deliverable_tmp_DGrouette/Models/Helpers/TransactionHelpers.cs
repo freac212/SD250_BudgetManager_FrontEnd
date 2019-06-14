@@ -88,25 +88,25 @@ namespace SD250_Deliverable_tmp_DGrouette.Models.Helpers
 
         public static bool BankAccntOrCategoriesIsNull(CreateTransactionViewModel viewModel, TempDataDictionary tempData)
         {
-            if ((viewModel.BankAccounts is null || viewModel.Categories is null) || (viewModel.BankAccounts.Count <= 0 || viewModel.Categories.Count <= 0) &&!tempData.Keys.Contains("LoginMessage"))
+            if ((viewModel.BankAccounts is null || viewModel.Categories is null) || (viewModel.BankAccounts.Count <= 0 || viewModel.Categories.Count <= 0) &&!tempData.Keys.Contains("Message"))
             {
-                tempData.Add("LoginMessage", "");
+                tempData.Add("Message", "");
                 tempData.Add("MessageColour", "danger");
             }
 
             if (viewModel.BankAccounts is null && viewModel.Categories is null || (viewModel.BankAccounts.Count <= 0 && viewModel.Categories.Count <= 0))
             {
-                tempData["LoginMessage"] = "There's no bank accounts or categories on this household yet. Create them before making a transaction!";
+                tempData["Message"] = "There's no bank accounts or categories on this household yet. Create them before making a transaction!";
                 return true;
             }
             else if (viewModel.BankAccounts is null || viewModel.BankAccounts.Count <= 0)
             {
-                tempData["LoginMessage"] = "There's no bank accounts on this household yet. Create one to make a transaction!";
+                tempData["Message"] = "There's no bank accounts on this household yet. Create one to make a transaction!";
                 return true;
             }
             else if (viewModel.Categories is null || viewModel.Categories.Count <= 0)
             {
-                tempData["LoginMessage"] = "There's no categories on this household yet. Create one to make a transaction!";
+                tempData["Message"] = "There's no categories on this household yet. Create one to make a transaction!";
                 return true;
             } else
             {

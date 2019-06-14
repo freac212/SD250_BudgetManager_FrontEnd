@@ -22,9 +22,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         // Rule of cleaning this up -> Go through each method, make sure they're only returning/ create/ whatever/ what they should be, look very carefully!
         // Also, clean up the viewModels, the Create views are being used in edits, others being used elsewhere so, clean that up.
         // Run through each views to make sure they look right, I know some buttons are pretty big so adjust those.
-        // JQuery Arrow images
-        // Does the Catagory, transaction, and account management rely on households? Or are they independant lists? (Because if they were I'd add lists to the side bar and have to rewrite a few queries)
-
         // GET: Household
         // > View households -> Created and households in
         [HttpGet]
@@ -82,13 +79,21 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData.Add("LoginMessage", "Household Created!");
+                TempData.Add("Message", "Household Created!");
                 return RedirectToAction("Index", "Household");
             }
             else
             {
-                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return View(createHouseholdViewModel);
+                if (createHouseholdViewModel != null)
+                {
+                    ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
+                    return View(createHouseholdViewModel);
+                }
+                else
+                {
+                    ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
+                    return View();
+                }
             }
         }
 
@@ -99,7 +104,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         {
             if (Id is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -116,7 +121,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             else
             {
                 ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return View();
+                return RedirectToAction("Index", "Household");
             }
         }
 
@@ -140,13 +145,22 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData.Add("LoginMessage", $"Household '{editHouseholdViewModel.Name}' Edited!");
+                TempData.Add("Message", $"Household '{editHouseholdViewModel.Name}' Edited!");
                 return RedirectToAction("Index", "Household");
             }
             else
             {
-                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return View(editHouseholdViewModel);
+
+                if (editHouseholdViewModel != null)
+                {
+                    ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
+                    return View(editHouseholdViewModel);
+                }
+                else
+                {
+                    ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
+                    return RedirectToAction("Index", "Household");
+                }
             }
         }
 
@@ -163,13 +177,13 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData.Add("LoginMessage", "Household Deleted!");
+                TempData.Add("Message", "Household Deleted!");
                 return RedirectToAction("Index", "Household");
             }
             else
             {
                 ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return View();
+                return RedirectToAction("Index", "Household");
             }
         }
 
@@ -202,7 +216,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             else
             {
                 ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return View();
+                return RedirectToAction("Index", "Household");
             }
         }
 
@@ -244,13 +258,22 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData.Add("LoginMessage", "User Invited to the household!");
+                TempData.Add("Message", "User Invited to the household!");
                 return RedirectToAction("Index", "Household");
             }
             else
             {
-                ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return View(inviteUserViewModel);
+
+                if (inviteUserViewModel != null)
+                {
+                    ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
+                    return View(inviteUserViewModel);
+                }
+                else
+                {
+                    ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
+                    return RedirectToAction("Index", "Household");
+                }
             }
         }
 
@@ -261,7 +284,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         {
             if (Id is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -272,7 +295,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData.Add("LoginMessage", "You've joined the household!");
+                TempData.Add("Message", "You've joined the household!");
                 return RedirectToAction("Index", "Household");
             }
             else
@@ -295,7 +318,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData.Add("LoginMessage", "You've left the household!");
+                TempData.Add("Message", "You've left the household!");
                 return RedirectToAction("Index", "Household");
             }
             else
@@ -323,7 +346,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             else
             {
                 ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return View();
+                return RedirectToAction("Index", "Household");
             }
         }
 
@@ -335,7 +358,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (Id is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -387,7 +410,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             else
             {
                 ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return View();
+                return RedirectToAction("Index", "Household");
             }
 
         }

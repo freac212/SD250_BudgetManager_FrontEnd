@@ -24,7 +24,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         {
             if (Id is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -54,7 +54,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             else
             {
                 ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return View();
+                return RedirectToAction("Index", "Household");
             }
         }
 
@@ -65,7 +65,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             // Household Id
             if (Id is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -99,7 +99,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData["LoginMessage"] = "Bank Account Created!";
+                TempData["Message"] = "Bank Account Created!";
                 return RedirectToAction("HouseholdBankAccounts", "BankAccount", new { Id = bankAccountViewModel.HouseholdId });
             }
             else
@@ -116,7 +116,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             // Bank Account Id
             if (Id is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -161,7 +161,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData.Add("LoginMessage", $"Account '{bankAccountViewModel.Name}' Edited!");
+                TempData.Add("Message", $"Account '{bankAccountViewModel.Name}' Edited!");
                 return RedirectToAction("HouseholdBankAccounts", "BankAccount", new { Id = bankAccountViewModel.HouseholdId });
             }
             else
@@ -179,7 +179,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             // Id is Bank Account Id
             if (Id is null || householdId is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -190,7 +190,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData["LoginMessage"] = "Account Deleted!";
+                TempData["Message"] = "Account Deleted!";
                 return RedirectToAction("HouseholdBankAccounts", "BankAccount", new { Id = householdId });
             }
             else
@@ -208,7 +208,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             // Id is Bank Account Id
             if (Id is null || householdId is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -222,7 +222,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
                 var responseResult = response.Content.ReadAsStringAsync().Result;
                 dynamic data = JsonConvert.DeserializeObject<ExpandoObject>(responseResult);
 
-                TempData["LoginMessage"] = $"Account '{data.Name}' balance has been updated!";
+                TempData["Message"] = $"Account '{data.Name}' balance has been updated!";
                 return RedirectToAction("HouseholdBankAccounts", "BankAccount", new { Id = householdId });
             }
             else

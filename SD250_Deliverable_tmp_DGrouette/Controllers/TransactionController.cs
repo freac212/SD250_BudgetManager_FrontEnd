@@ -25,7 +25,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         {
             if (Id is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -75,7 +75,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             // Household Id
             if (Id is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -127,7 +127,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData.Add("LoginMessage", "Transaction Created!");
+                TempData.Add("Message", "Transaction Created!");
                 return RedirectToAction("HouseholdTransactions", "Transaction", new { Id = transactionViewModel.HouseholdId });
             }
             else
@@ -149,7 +149,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             // Category Id
             if (Id is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -168,7 +168,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
                 if (data.Categories is null)
                 {
-                    TempData.Add("LoginMessage", "Error: Categories missing");
+                    TempData.Add("Message", "Error: Categories missing");
                     TempData.Add("MessageColour", "danger");
                     return RedirectToAction("Index", "Household");
                 }
@@ -194,7 +194,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
                 if (transactionViewModel.Categories is null)
                 {
-                    TempData.Add("LoginMessage", "Error: Categories missing");
+                    TempData.Add("Message", "Error: Categories missing");
                     TempData.Add("MessageColour", "danger");
                     return RedirectToAction("Index", "Household");
                 }
@@ -218,7 +218,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData.Add("LoginMessage", $"Transaction '{transactionViewModel.Title}' Edited!");
+                TempData.Add("Message", $"Transaction '{transactionViewModel.Title}' Edited!");
                 return RedirectToAction("HouseholdTransactions", "Transaction", new { Id = transactionViewModel.HouseholdId });
             }
             else
@@ -229,7 +229,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
                 if (transactionViewModel.Categories is null)
                 {
-                    TempData.Add("LoginMessage", "Error: Categories missing");
+                    TempData.Add("Message", "Error: Categories missing");
                     TempData.Add("MessageColour", "danger");
                     return RedirectToAction("Index", "Household");
                 }
@@ -247,7 +247,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             // Id is Transaction Id
             if (Id is null || householdId is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -258,7 +258,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData["LoginMessage"] = "Transaction Deleted!";
+                TempData["Message"] = "Transaction Deleted!";
                 return RedirectToAction("HouseholdTransactions", "Transaction", new { Id = householdId });
             }
             else
@@ -277,7 +277,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             // Id is Transaction Id
             if (Id is null || householdId is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -288,7 +288,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData["LoginMessage"] = $"Transaction's void state has been changed successfully!";
+                TempData["Message"] = $"Transaction's void state has been changed successfully!";
                 return RedirectToAction("HouseholdTransactions", "Transaction", new { Id = householdId });
             }
             else

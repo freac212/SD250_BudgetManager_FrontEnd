@@ -24,7 +24,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         {
             if (Id is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -65,7 +65,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             // Household Id
             if (Id is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -99,7 +99,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData.Add("LoginMessage", "Category Created!");
+                TempData.Add("Message", "Category Created!");
                 return RedirectToAction("HouseholdCategories", "Category", new {Id = categoryViewModel.HouseholdId});
             }
             else
@@ -116,7 +116,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             // Category Id
             if (Id is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -161,7 +161,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData.Add("LoginMessage", $"Category '{categoryViewModel.Name}' Edited!");
+                TempData.Add("Message", $"Category '{categoryViewModel.Name}' Edited!");
                 return RedirectToAction("HouseholdCategories", "Category", new { Id = categoryViewModel.HouseholdId });
             }
             else
@@ -180,7 +180,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             // Id is Category Id
             if (Id is null || householdId is null)
             {
-                TempData.Add("LoginMessage", "Improper Id");
+                TempData.Add("Message", "Improper Id");
                 TempData.Add("MessageColour", "danger");
                 return RedirectToAction("Index", "Household");
             }
@@ -191,7 +191,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData["LoginMessage"] = "Category Deleted!";
+                TempData["Message"] = "Category Deleted!";
                 return RedirectToAction("HouseholdCategories", "Category", new { Id = householdId });
             }
             else
