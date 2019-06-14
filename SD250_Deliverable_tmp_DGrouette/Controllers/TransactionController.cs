@@ -63,7 +63,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             else
             {
                 ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return View();
+                return RedirectToAction("Index", "Household");
             }
         }
 
@@ -178,7 +178,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             else
             {
                 ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return View();
+                return RedirectToAction("Index", "Household");
             }
         }
 

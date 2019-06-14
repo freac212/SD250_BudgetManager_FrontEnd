@@ -54,7 +54,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             else
             {
                 ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return View();
+                return RedirectToAction("Index", "Household");
             }
         }
 
@@ -129,21 +129,21 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             {
                 var responseResult = response.Content.ReadAsStringAsync().Result;
 
-                var data = JsonConvert.DeserializeObject<CreateCategoryViewModel>(responseResult);
+                var data = JsonConvert.DeserializeObject<EditCategoryViewModel>(responseResult);
 
                 return View(data);
             }
             else
             {
                 ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return View();
+                return RedirectToAction("Index", "Household");
             }
         }
 
         // POST: Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(CreateCategoryViewModel categoryViewModel)
+        public ActionResult Edit(EditCategoryViewModel categoryViewModel)
         {
             if (!ModelState.IsValid)
                 return View(categoryViewModel);

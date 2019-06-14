@@ -9,8 +9,6 @@ namespace SD250_Deliverable_tmp_DGrouette.Models.Views
     public class CreateCategoryViewModel
     {
         [Required]
-        public int Id { get; set; }
-        [Required]
         public string Description { get; set; }
         [Required]
         public string Name { get; set; }

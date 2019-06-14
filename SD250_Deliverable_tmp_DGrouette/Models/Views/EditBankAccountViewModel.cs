@@ -6,8 +6,10 @@ using System.Web;
 
 namespace SD250_Deliverable_tmp_DGrouette.Models.Views
 {
-    public class CreateBankAccountViewModel
+    public class EditBankAccountViewModel
     {
+        [Required]
+        public int Id { get; set; }
         [Required]
         public string Description { get; set; }
         [Required]

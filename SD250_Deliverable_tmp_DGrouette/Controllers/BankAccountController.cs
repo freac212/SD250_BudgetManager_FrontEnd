@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SD220_Deliverable_1_DGrouette.Models.Filters;
 using SD250_Deliverable_tmp_DGrouette.Models.Helpers;
 using SD250_Deliverable_tmp_DGrouette.Models.Views;
 using SD250_Deliverable_tmp_DGrouette.Models.Wrappers;
@@ -14,6 +15,7 @@ using System.Web.Mvc;
 
 namespace SD250_Deliverable_tmp_DGrouette.Controllers
 {
+    [Auth]
     public class BankAccountController : Controller
     {
         // Only household owner can create, edit, delete BankAccounts
@@ -105,7 +107,14 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             else
             {
                 ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return View(bankAccountViewModel);
+
+                if (bankAccountViewModel != null)
+                {
+                    return View(bankAccountViewModel);
+                } else
+                {
+                    return RedirectToAction("Index", "Household");
+                }
             }
         }
 
@@ -129,7 +138,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             {
                 var responseResult = response.Content.ReadAsStringAsync().Result;
 
-                var data = JsonConvert.DeserializeObject<CreateBankAccountViewModel>(responseResult);
+                var data = JsonConvert.DeserializeObject<EditBankAccountViewModel>(responseResult);
 
                 return View(data);
             }
@@ -143,7 +152,7 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
         // POST: Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(CreateBankAccountViewModel bankAccountViewModel)
+        public ActionResult Edit(EditBankAccountViewModel bankAccountViewModel)
         {
             if (!ModelState.IsValid)
                 return View(bankAccountViewModel);
@@ -167,7 +176,15 @@ namespace SD250_Deliverable_tmp_DGrouette.Controllers
             else
             {
                 ErrorHelpers.HandleResponseErrors(response, TempData, ModelState);
-                return View(bankAccountViewModel);
+
+                if (bankAccountViewModel != null)
+                {
+                    return View(bankAccountViewModel);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Household");
+                }
             }
         }
 

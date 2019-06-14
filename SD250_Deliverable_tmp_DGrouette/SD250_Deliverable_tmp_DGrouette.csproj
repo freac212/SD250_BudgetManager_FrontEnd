@@ -216,6 +216,8 @@
     <Compile Include="Models\Helpers\TransactionHelpers.cs" />
     <Compile Include="Models\Views\BankAccountViewModel.cs" />
     <Compile Include="Models\Views\BankAccountListViewModel.cs" />
+    <Compile Include="Models\Views\EditCategoryViewModel.cs" />
+    <Compile Include="Models\Views\EditBankAccountViewModel.cs" />
     <Compile Include="Models\Views\EditTransactionViewModel.cs" />
     <Compile Include="Models\Views\CreateTransactionViewModel.cs" />
     <Compile Include="Models\Views\HouseholdDetailsViewModel.cs" />
